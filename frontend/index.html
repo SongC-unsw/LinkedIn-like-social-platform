@@ -24,6 +24,20 @@
     <main role="main">
       <!--2.1. Milestone 1 - Registration & Login -->
       <!-- app goes here -->
+      <div class="modal fade" tabindex="-1" role="dialog" id="popup">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content rounded-4 shadow">
+            <div class="modal-header border-bottom-0">
+              <h1 class="modal-title fs-5">Error Popup</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-0">
+              <p></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="login page"></div>
       <div class="registration page">
         <div class="container">
@@ -38,7 +52,7 @@
                     <div class="mb-3">
                       <label for="email" class="form-label">Email</label>
                       <input
-                        type="email"
+                        type="text"
                         class="form-control"
                         id="email"
                         placeholder="Enter your email"

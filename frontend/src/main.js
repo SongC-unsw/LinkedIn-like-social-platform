@@ -31,6 +31,13 @@ const apiCall = (path, body) => {
       }
     });
   };
+
+const errorPopup = (msg) => {
+    const popup = document.getElementById('popup');
+    popup.querySelector(".modal-body p").textContent = msg;
+    const modalInstance = new bootstrap.Modal(popup);
+    modalInstance.show();
+}
 showPage('registration');
 const submitBtn = document.getElementById("submit");
 submitBtn.addEventListener("click", () => {
@@ -45,5 +52,9 @@ submitBtn.addEventListener("click", () => {
         name: name,
         password: password
     };
-    apiCall("auth/register",Data);
+    if (passConfirm !== password) {
+      errorPopup('Password doesn\'t match');
+    } else {
+      apiCall("auth/register",Data);
+    }
 })
