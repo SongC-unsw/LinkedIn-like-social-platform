@@ -1,7 +1,7 @@
 import { BACKEND_PORT } from "./config.js";
 // A helper you may want to use when uploading new images to the server.
 import { fileToDataUrl } from "./helpers.js";
-
+let token = localStorage.getItem("token");
 const showPage = (chosenPage) => {
   const pages = document.querySelectorAll(".page");
   for (const page of pages) {
@@ -10,20 +10,15 @@ const showPage = (chosenPage) => {
   document.querySelector(`.${chosenPage}.page`).classList.remove("hide");
 };
 
-if (localStorage.getItem("token")) {
-  showPage("home");
-} else {
-  showPage("login");
-}
-
 const apiCall = (path, body, mtd) => {
   // Method hardcoded as POST need improvement
   return fetch("http://localhost:5005/" + path, {
     method: mtd,
     headers: {
       "Content-type": "application/json",
+      Authorization: token ? `Bearer ${token}` : undefined,
     },
-    body: JSON.stringify(body),
+    body: mtd === "GET" ? undefined : JSON.stringify(body),
   })
     .then((response) => response.json())
     .then((data) => {
@@ -35,6 +30,21 @@ const apiCall = (path, body, mtd) => {
       }
     });
 };
+
+const loadFeed = () => {
+  apiCall("job/feed/?start=0", {}, "GET").then((response) => {
+    console.log(response);
+    // document.querySelector(".feed").innerText = response;
+  });
+};
+
+if (localStorage.getItem("token")) {
+  showPage("home");
+  loadFeed();
+} else {
+  showPage("login");
+}
+
 
 const errorPopup = (msg) => {
   const popup = document.getElementById("popup");
@@ -58,28 +68,29 @@ submitBtn.addEventListener("click", () => {
   if (passConfirm !== password) {
     errorPopup("Password doesn't match");
   } else {
-    apiCall("auth/register", Data, "POST")
-    .then((data) => {
+    apiCall("auth/register", Data, "POST").then((data) => {
       localStorage.setItem("token", data.token);
       showPage("home");
+      loadFeed();
     });
   }
 });
 
 // signup logic
 const loginBtn = document.getElementById("login");
-loginBtn.addEventListener("click", ()=> {
+loginBtn.addEventListener("click", () => {
   const email = document.getElementById("email-login").value;
   const password = document.getElementById("password-login").value;
   const Data = {
     email: email,
     password: password,
-  }
-  apiCall("auth/login",Data,"POST").then(response => {
+  };
+  apiCall("auth/login", Data, "POST").then((response) => {
     localStorage.setItem("token", response.token);
     showPage("home");
-  })
-})
+    loadFeed();
+  });
+});
 
 // links
 document.getElementById("login-link").addEventListener("click", () => {
@@ -93,4 +104,4 @@ const logoutBtn = document.getElementById("logout-btn");
 logoutBtn.addEventListener("click", () => {
   localStorage.removeItem("token");
   showPage("login");
-})
+});
