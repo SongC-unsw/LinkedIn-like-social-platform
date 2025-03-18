@@ -34,7 +34,14 @@ const apiCall = (path, body, mtd) => {
 const loadFeed = () => {
   apiCall("job/feed/?start=0", {}, "GET").then((response) => {
     console.log(response);
-    // document.querySelector(".feed").innerText = response;
+    document.querySelector(".feed").innerHTML = "";
+    
+    for (const post of response) {
+      const feedPost = document.createElement("div");
+      feedPost.className = "feed-post";
+      feedPost.innerText = post.title;
+      document.querySelector(".feed").appendChild(feedPost);
+    }
   });
 };
 
