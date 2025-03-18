@@ -45,5 +45,5 @@ submitBtn.addEventListener("click", () => {
         name: name,
         password: password
     };
-    apiCall("/auth/register",Data);
+    apiCall("auth/register",Data);
 })
