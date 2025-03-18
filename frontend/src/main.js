@@ -2,7 +2,6 @@ import { BACKEND_PORT } from "./config.js";
 // A helper you may want to use when uploading new images to the server.
 import { fileToDataUrl } from "./helpers.js";
 
-console.log("Let's go!");
 const showPage = (chosenPage) => {
   const pages = document.querySelectorAll(".page");
   for (const page of pages) {
@@ -10,15 +9,17 @@ const showPage = (chosenPage) => {
   }
   document.querySelector(`.${chosenPage}.page`).classList.remove("hide");
 };
+
 if (localStorage.getItem("token")) {
   showPage("home");
+} else {
+  showPage("login");
 }
 
-showPage("login");
-const apiCall = (path, body) => {
+const apiCall = (path, body, mtd) => {
   // Method hardcoded as POST need improvement
   return fetch("http://localhost:5005/" + path, {
-    method: "POST",
+    method: mtd,
     headers: {
       "Content-type": "application/json",
     },
@@ -41,6 +42,8 @@ const errorPopup = (msg) => {
   const modalInstance = new bootstrap.Modal(popup);
   modalInstance.show();
 };
+
+// register logic
 const submitBtn = document.getElementById("submit");
 submitBtn.addEventListener("click", () => {
   const email = document.getElementById("email").value;
@@ -55,11 +58,30 @@ submitBtn.addEventListener("click", () => {
   if (passConfirm !== password) {
     errorPopup("Password doesn't match");
   } else {
-    apiCall("auth/register", Data).then((data) => {
+    apiCall("auth/register", Data, "POST")
+    .then((data) => {
       localStorage.setItem("token", data.token);
+      showPage("home");
     });
   }
 });
+
+// signup logic
+const loginBtn = document.getElementById("login");
+loginBtn.addEventListener("click", ()=> {
+  const email = document.getElementById("email-login").value;
+  const password = document.getElementById("password-login").value;
+  const Data = {
+    email: email,
+    password: password,
+  }
+  apiCall("auth/login",Data,"POST").then(response => {
+    localStorage.setItem("token", response.token);
+    showPage("home");
+  })
+})
+
+// links
 document.getElementById("login-link").addEventListener("click", () => {
   showPage("login");
 });
@@ -67,3 +89,8 @@ document.getElementById("login-link").addEventListener("click", () => {
 document.getElementById("signup-link").addEventListener("click", () => {
   showPage("registration");
 });
+const logoutBtn = document.getElementById("logout-btn");
+logoutBtn.addEventListener("click", () => {
+  localStorage.removeItem("token");
+  showPage("login");
+})
