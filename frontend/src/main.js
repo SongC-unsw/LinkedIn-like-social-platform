@@ -60,3 +60,10 @@ submitBtn.addEventListener("click", () => {
     });
   }
 });
+document.getElementById("login-link").addEventListener("click", () => {
+  showPage("login");
+});
+
+document.getElementById("signup-link").addEventListener("click", () => {
+  showPage("registration");
+});
