@@ -16,7 +16,7 @@ const apiCall = (path, body, mtd) => {
     method: mtd,
     headers: {
       "Content-type": "application/json",
-      Authorization: token ? `Bearer ${token}` : undefined,
+      "Authorization": token ? `Bearer ${token}` : undefined,
     },
     body: mtd === "GET" ? undefined : JSON.stringify(body),
   })
