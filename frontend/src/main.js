@@ -41,6 +41,7 @@ const loadFeed = () => {
     // post
     for (const post of response) {
       // make sure to only show jobs start date later than today
+      // TODO: show post from latest first
       const startDate = new Date(post.start);
       const currentDate = new Date();
       if (startDate >= currentDate) {
