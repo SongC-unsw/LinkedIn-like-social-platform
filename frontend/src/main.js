@@ -187,8 +187,80 @@ const creatPost = async (post) => {
   comBtn.classList.add("btn", "btn-primary");
   // comment section
 
+  const comSection = document.createElement("div");
+  comSection.classList.add(
+    "comment-section",
+    "container",
+    "bg-light",
+    "p-3",
+    "mt-2",
+    "rounded",
+    "hide",
+  );
+  // comSection.style.display = "none"; // Hidden by default, shown when comment button is clicked
+
+  // Display existing comments
+  if (post.comments.length > 0) {
+    const commentsList = document.createElement("div");
+    commentsList.classList.add("comments-list");
+
+    for (const comment of post.comments) {
+      const commentItem = document.createElement("div");
+      commentItem.classList.add(
+        "comment-item",
+        "d-flex",
+        "mb-2",
+        "pb-2",
+        "border-bottom"
+      );
+      // Comment user avatar (placeholder)
+      const commentAvatar = document.createElement("div");
+      commentAvatar.classList.add("comment-avatar", "me-2");
+      const avatarContainer = document.createElement("div");
+      avatarContainer.className =
+        "rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center";
+      avatarContainer.style.width = "32px";
+      avatarContainer.style.height = "32px";
+      avatarContainer.style.fontSize = "14px";
+      avatarContainer.textContent = comment.userName
+        ? comment.userName.charAt(0)
+        : "U";
+      commentAvatar.appendChild(avatarContainer);
+
+      // Comment content
+      const commentContent = document.createElement("div");
+      commentContent.classList.add("comment-content", "flex-grow-1");
+      // Comment user name
+      const commentUser = document.createElement("div");
+      commentUser.classList.add("comment-user", "fw-bold", "small");
+      commentUser.innerText = comment.userName;
+
+      const commentText = document.createElement("div");
+      commentText.classList.add("comment-text", "small");
+      commentText.innerText = comment.comment;
+      // assemble comment section
+      commentContent.appendChild(commentUser);
+      commentContent.appendChild(commentText);
+      commentItem.appendChild(commentAvatar);
+      commentItem.appendChild(commentContent);
+      commentsList.appendChild(commentItem);
+    }
+
+    comSection.appendChild(commentsList);
+  } else {
+    const noComments = document.createElement("p");
+    noComments.classList.add("text-muted", "small", "fst-italic");
+    noComments.innerText = "No comments yet";
+    comSection.appendChild(noComments);
+  }
+  // Toggle comments when clicking the comment button
+  comBtn.addEventListener("click", () => {
+    comSection.classList.toggle("hide");
+  });
+  
   commAndLikes.append(likeBtn, comBtn);
   feedPost.appendChild(commAndLikes);
+  feedPost.appendChild(comSection);
   document.querySelector(".feed").appendChild(feedPost);
 };
 
