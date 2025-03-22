@@ -164,12 +164,14 @@ const creatPost = async (post) => {
   commAndLikes.classList.add("container", "d-flex", "justify-content-between", "align-items-center", "mt-3");
   // like button
   const likeBtn = document.createElement("button");
-  likeBtn.innerText = "👍";
+  const likeNum = post.likes.length;
+  likeBtn.innerText = `👍 ${likeNum>0? likeNum:""}`;
   likeBtn.classList.add("btn", "btn-primary");
 
   // comment button
   const comBtn = document.createElement("button");
-  comBtn.innerText="💬";
+  const comNum = post.comments.length;
+  comBtn.innerText=`💬 ${comNum > 0 ? comNum: ""}`;
   comBtn.classList.add("btn", "btn-primary");
   commAndLikes.append(likeBtn,comBtn);
   feedPost.appendChild(commAndLikes);
