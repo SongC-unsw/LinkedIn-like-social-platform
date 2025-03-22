@@ -44,10 +44,18 @@ const loadFeed = () => {
     }
   });
 };
-
+const handleLikes = (likeBtn, post, haveLiked) => {
+  likeBtn.addEventListener("click", () => {
+    apiCall("job/like", {
+      id: post.id,
+      turnon: haveLiked? false : true,
+    }, "PUT")
+});
+};
 const creatPost = async (post) => {
   // async function to deal with apicall
   // post here is a response object
+  console.log(post);
   const feedPost = document.createElement("div");
   feedPost.className = "feed-post";
   feedPost.id = `post-${post.id}`;
@@ -94,6 +102,8 @@ const creatPost = async (post) => {
   topSection.appendChild(pfpContainer);
 
   const response = await apiCall(`user?userId=${post.creatorId}`, {}, "GET");
+  console.log(response);
+
   const userName = response.name;
 
   // create name element
@@ -178,7 +188,17 @@ const creatPost = async (post) => {
   const likeBtn = document.createElement("button");
   const likeNum = post.likes.length;
   likeBtn.innerText = `👍 ${likeNum > 0 ? likeNum : ""}`;
+  likeBtn.type = "button";
   likeBtn.classList.add("btn", "btn-primary");
+  // New likes
+  let haveLiked = false;
+  for (const e of post.likes) {
+    if (String(e.userId) === localStorage.getItem("userId")) {
+      haveLiked = true;
+      break;
+    }
+  }
+  handleLikes(likeBtn, post, haveLiked);
 
   // comment button
   const comBtn = document.createElement("button");
@@ -195,9 +215,8 @@ const creatPost = async (post) => {
     "p-3",
     "mt-2",
     "rounded",
-    "hide",
+    "hide"
   );
-  // comSection.style.display = "none"; // Hidden by default, shown when comment button is clicked
 
   // Display existing comments
   if (post.comments.length > 0) {
@@ -253,11 +272,28 @@ const creatPost = async (post) => {
     noComments.innerText = "No comments yet";
     comSection.appendChild(noComments);
   }
+  // Add new comment
+  const commentForm = document.createElement("div");
+  commentForm.classList.add("comment-form", "mt-3", "d-flex");
+
+  const commentInput = document.createElement("input");
+  commentInput.type = "text";
+  commentInput.classList.add("form-control", "form-control-sm", "me-2");
+  commentInput.placeholder = "Add a comment...";
+
+  const commentSubmit = document.createElement("button");
+  commentSubmit.classList.add("btn", "btn-sm", "btn-primary");
+  commentSubmit.innerText = "Post";
+
+  commentForm.appendChild(commentInput);
+  commentForm.appendChild(commentSubmit);
+  comSection.appendChild(commentForm);
+
   // Toggle comments when clicking the comment button
   comBtn.addEventListener("click", () => {
     comSection.classList.toggle("hide");
   });
-  
+
   commAndLikes.append(likeBtn, comBtn);
   feedPost.appendChild(commAndLikes);
   feedPost.appendChild(comSection);
@@ -295,6 +331,7 @@ submitBtn.addEventListener("click", () => {
   } else {
     apiCall("auth/register", Data, "POST").then((data) => {
       localStorage.setItem("token", data.token);
+      localStorage.setItem("userId", data.userId);
       showPage("home");
       loadFeed();
     });
@@ -312,6 +349,7 @@ loginBtn.addEventListener("click", () => {
   };
   apiCall("auth/login", Data, "POST").then((response) => {
     localStorage.setItem("token", response.token);
+    localStorage.setItem("userId", response.userId);
     showPage("home");
     loadFeed();
   });
@@ -327,6 +365,6 @@ document.getElementById("signup-link").addEventListener("click", () => {
 });
 const logoutBtn = document.getElementById("logout-btn");
 logoutBtn.addEventListener("click", () => {
-  localStorage.removeItem("token");
+  localStorage.clear();
   showPage("login");
 });
