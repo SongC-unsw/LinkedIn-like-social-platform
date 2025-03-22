@@ -46,6 +46,7 @@ const loadFeed = () => {
 };
 
 const creatPost = async (post) => {
+  // async function to deal with apicall
   // post here is a response object
   const feedPost = document.createElement("div");
   feedPost.className = "feed-post";
@@ -82,18 +83,19 @@ const creatPost = async (post) => {
   timeElement.className = "post-time";
   const now = new Date()
   const timeCreated = new Date(post.createdAt);
-  if ((now - timeCreated) > 86400000 ) {
+  if ((now - timeCreated) > 86400000 ) { // if greater than a day
     const year = timeCreated.getFullYear();
     const day = String(timeCreated.getDate()).padStart(2, '0');
     const month = String(timeCreated.getMonth() + 1).padStart(2, '0');
 
-    timeElement.innerText = `${day}/${month}/${year}`;
+    timeElement.innerText = `${day}/${month}/${year}`; // DD/MM/YYYY
   } else {
     const diffInMs = now - timeCreated;
     const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
     const diffInHours = Math.floor(diffInMinutes / 60);
     const reaminderMinutes = diffInMinutes % 60;
-    timeElement.innerText = `${diffInHours} ${diffInHours > 1 ? 'hours':'hour'} and ${reaminderMinutes} ${reaminderMinutes>1? 'minutes':'minute'} ago.`
+    timeElement.innerText = `${diffInHours} ${diffInHours > 1 ? 'hours':'hour'} and ${reaminderMinutes} ${reaminderMinutes>1? 'minutes':'minute'} ago`
+    // time display format
   }
   // Append elements to header
   authorInfo.appendChild(nameElement);
@@ -101,6 +103,21 @@ const creatPost = async (post) => {
   postHeader.appendChild(timeElement);
   feedPost.appendChild(postHeader);
 
+  // create post main content
+  const postContent = document.createElement("div");
+  postContent.className = "post-content";
+  // create post title
+  const postTitle = document.createElement("h4");
+  postTitle.className = "post-title";
+  postTitle.innerText = post.title;
+  // create job description
+  const jobDetail = document.createElement("p");
+  jobDetail.className = "post-job-detail";
+  jobDetail.innerText = post.description;
+  // append element to main content
+  postContent.append(postTitle,jobDetail);
+  feedPost.appendChild(postContent);
+  
   document.querySelector(".feed").appendChild(feedPost);
 }
 
