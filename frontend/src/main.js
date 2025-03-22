@@ -50,26 +50,42 @@ const creatPost = async (post) => {
   // post here is a response object
   const feedPost = document.createElement("div");
   feedPost.className = "feed-post";
-  feedPost.id = `post=${post.id}`;
+  feedPost.id = `post-${post.id}`;
 
-  // post-header, time and creator
+  const topSection = document.createElement("div");
+  topSection.className = "post-top-section";
+  topSection.style.display = "flex";
+  topSection.style.alignItems = "center";
+  // post-header, time and creator name
   const postHeader = document.createElement("div");
   postHeader.className = "post-header";
 
-  const authorInfo = document.createElement("div");
-  authorInfo.className = "author-info";
   // profile pic
+  const pfp = document.createElement("img");
+
   if (post.image) {
-    const pfp = document.createElement("img");
     pfp.src = post.image;
     pfp.alt = "profile picture";
     pfp.className = "profile-picture";
-    pfp.style.display = "inline-block";
-    authorInfo.appendChild(pfp);
-    authorInfo.style.display = "flex";
-    authorInfo.style.alignItems = "center";
-    authorInfo.style.gap = "10px";
+    pfp.classList.add("rounded-circle","img-fluid");
+    pfp.width = "50";
+    pfp.height = "50";
+
+  } else {
+    pfp.className = "profile-picture rounded-circle";
+    pfp.style.width = "50";
+    pfp.style.height = "50";
+    pfp.style.backgroundColor = "#6c757d"; // Default gray color
+    pfp.style.display = "flex";
+    pfp.style.alignItems = "center";
+    pfp.style.justifyContent = "center";
   }
+  const pfpContainer = document.createElement("div");
+  pfpContainer.style.width = "60px";
+  pfpContainer.style.flexShrink = "0";
+  pfpContainer.appendChild(pfp);
+  topSection.appendChild(pfpContainer);
+
   const response = await apiCall(`user?userId=${post.creatorId}`,{},"GET");
   const userName = response.name;
 
@@ -77,10 +93,14 @@ const creatPost = async (post) => {
   const nameElement = document.createElement("div");
   nameElement.className = "author-name";
   nameElement.innerText = userName;
+  nameElement.classList.add("fw-bold");
+  nameElement.style.fontSize = "1.3rem"
       
   // Create time element
   const timeElement = document.createElement("div");
   timeElement.className = "post-time";
+  timeElement.classList.add("text-secondary");
+  timeElement.style.fontSize = "0.8rem"
   const now = new Date()
   const timeCreated = new Date(post.createdAt);
   if ((now - timeCreated) > 86400000 ) { // if greater than a day
@@ -97,11 +117,20 @@ const creatPost = async (post) => {
     timeElement.innerText = `${diffInHours} ${diffInHours > 1 ? 'hours':'hour'} and ${reaminderMinutes} ${reaminderMinutes>1? 'minutes':'minute'} ago`
     // time display format
   }
+
+
+  // top section styling
+  postHeader.style.display = "flex";
+  postHeader.style.flexDirection = "column";
+  topSection.style.display = "flex";
+  postHeader.classList.add('ms-3'); // adds margin-left
+  topSection.classList.add('mb-3');
+
   // Append elements to header
-  authorInfo.appendChild(nameElement);
-  postHeader.appendChild(authorInfo);
+  postHeader.appendChild(nameElement);
   postHeader.appendChild(timeElement);
-  feedPost.appendChild(postHeader);
+  topSection.appendChild(postHeader);
+  feedPost.appendChild(topSection);
 
   // create post main content
   const postContent = document.createElement("div");
