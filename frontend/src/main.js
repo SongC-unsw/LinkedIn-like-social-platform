@@ -44,12 +44,29 @@ const loadFeed = () => {
     }
   });
 };
+const updateLikeBtn = (likeBtn, haveLiked) => {
+  if (haveLiked) {
+    likeBtn.classList.remove("btn-primary");
+    likeBtn.classList.add("btn-success");
+  } else {
+    likeBtn.classList.remove("btn-success");
+    likeBtn.classList.add("btn-primary");
+  }
+}
 const handleLikes = (likeBtn, post, haveLiked) => {
+  let currentCount = post.likes.length;
   likeBtn.addEventListener("click", () => {
     apiCall("job/like", {
       id: post.id,
-      turnon: haveLiked? false : true,
+      turnon: !haveLiked
     }, "PUT")
+    .then(() => {
+      haveLiked = !haveLiked;
+      updateLikeBtn(likeBtn, haveLiked);
+      // Update the like count
+      currentCount = haveLiked? currentCount+1 : currentCount -1;
+      likeBtn.innerText = `👍 ${currentCount > 0 ? currentCount : ''}`;
+    });
 });
 };
 const creatPost = async (post) => {
@@ -198,6 +215,7 @@ const creatPost = async (post) => {
       break;
     }
   }
+  updateLikeBtn(likeBtn, haveLiked);
   handleLikes(likeBtn, post, haveLiked);
 
   // comment button
