@@ -41,7 +41,8 @@ const loadFeed = () => {
     // post
     for (const post of response) {
       // make sure to only show jobs start date later than today
-      // TODO: show post from latest first
+      // Sort posts by creation date, newest first
+      response.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       const startDate = new Date(post.start);
       const currentDate = new Date();
       if (startDate >= currentDate) {
@@ -93,7 +94,7 @@ const creatPost = async (post) => {
   // post here is a response object
   console.log(post);
   const feedPost = document.createElement("div");
-  feedPost.className = "feed-post";
+  feedPost.className = "feed-post bg-white mb-3 shadow-sm p-4";
   feedPost.id = `post-${post.id}`;
   feedPost.classList.add("d-flex", "flex-column");
 
