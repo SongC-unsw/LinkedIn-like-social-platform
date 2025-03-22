@@ -63,8 +63,8 @@ const creatPost = async (post) => {
   // profile pic
   const pfp = document.createElement("img");
 
-  if (post.image) {
-    pfp.src = post.image;
+  if (post.avatar) {
+    pfp.src = post.avatar;
     pfp.alt = "profile picture";
     pfp.className = "profile-picture";
     pfp.classList.add("rounded-circle","img-fluid");
@@ -75,10 +75,15 @@ const creatPost = async (post) => {
     pfp.className = "profile-picture rounded-circle";
     pfp.style.width = "50";
     pfp.style.height = "50";
-    pfp.style.backgroundColor = "#6c757d"; // Default gray color
-    pfp.style.display = "flex";
-    pfp.style.alignItems = "center";
-    pfp.style.justifyContent = "center";
+    // Create a default profile picture using SVG
+    pfp.src = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="50" height="50">
+        <rect width="100" height="100" fill="#6c757d" />
+        <circle cx="50" cy="40" r="20" fill="#dee2e6" />
+        <circle cx="50" cy="100" r="40" fill="#dee2e6" />
+      </svg>
+    `);
+    pfp.alt = "default profile picture";
   }
   const pfpContainer = document.createElement("div");
   pfpContainer.style.width = "60px";
@@ -135,6 +140,7 @@ const creatPost = async (post) => {
   // create post main content
   const postContent = document.createElement("div");
   postContent.className = "post-content";
+  postContent.style.width = "100%";
   // create post title
   const postTitle = document.createElement("h4");
   postTitle.className = "post-title";
@@ -143,9 +149,18 @@ const creatPost = async (post) => {
   const jobDetail = document.createElement("p");
   jobDetail.className = "post-job-detail";
   jobDetail.innerText = post.description;
+  //create img element
+  const descriptionImg = document.createElement("img");
+  descriptionImg.classList.add("img-fluid","img-thumbnail");
+  descriptionImg.style.width = "100%";
+  descriptionImg.src = post.image;
+
   // append element to main content
-  postContent.append(postTitle,jobDetail);
+  postContent.append(postTitle,jobDetail,descriptionImg);
   feedPost.appendChild(postContent);
+
+
+  //comment section and likes
   
   document.querySelector(".feed").appendChild(feedPost);
 }
