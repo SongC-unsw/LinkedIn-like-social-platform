@@ -51,6 +51,7 @@ const creatPost = async (post) => {
   const feedPost = document.createElement("div");
   feedPost.className = "feed-post";
   feedPost.id = `post-${post.id}`;
+  feedPost.classList.add("d-flex","flex-column");
 
   const topSection = document.createElement("div");
   topSection.className = "post-top-section";
@@ -158,10 +159,20 @@ const creatPost = async (post) => {
   // append element to main content
   postContent.append(postTitle,jobDetail,descriptionImg);
   feedPost.appendChild(postContent);
-
-
   //comment section and likes
-  
+  const commAndLikes = document.createElement("div");
+  commAndLikes.classList.add("container", "d-flex", "justify-content-between", "align-items-center", "mt-3");
+  // like button
+  const likeBtn = document.createElement("button");
+  likeBtn.innerText = "👍";
+  likeBtn.classList.add("btn", "btn-primary");
+
+  // comment button
+  const comBtn = document.createElement("button");
+  comBtn.innerText="💬";
+  comBtn.classList.add("btn", "btn-primary");
+  commAndLikes.append(likeBtn,comBtn);
+  feedPost.appendChild(commAndLikes);
   document.querySelector(".feed").appendChild(feedPost);
 }
 
