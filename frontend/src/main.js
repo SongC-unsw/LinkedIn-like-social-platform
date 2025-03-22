@@ -1,7 +1,7 @@
 import { BACKEND_PORT } from "./config.js";
 // A helper you may want to use when uploading new images to the server.
 import { fileToDataUrl } from "./helpers.js";
-let token = localStorage.getItem("token");
+
 const showPage = (chosenPage) => {
   const pages = document.querySelectorAll(".page");
   for (const page of pages) {
@@ -12,6 +12,7 @@ const showPage = (chosenPage) => {
 
 const apiCall = (path, body, mtd) => {
   // Method hardcoded as POST need improvement
+  const token = localStorage.getItem("token");
   return fetch("http://localhost:5005/" + path, {
     method: mtd,
     headers: {
@@ -31,19 +32,77 @@ const apiCall = (path, body, mtd) => {
     });
 };
 
+// feed logic
 const loadFeed = () => {
+  // after login or signup, token set
   apiCall("job/feed/?start=0", {}, "GET").then((response) => {
     console.log(response);
     document.querySelector(".feed").innerHTML = "";
-    
+    // post
     for (const post of response) {
-      const feedPost = document.createElement("div");
-      feedPost.className = "feed-post";
-      feedPost.innerText = post.title;
-      document.querySelector(".feed").appendChild(feedPost);
+      creatPost(post);
     }
   });
 };
+
+const creatPost = async (post) => {
+  // post here is a response object
+  const feedPost = document.createElement("div");
+  feedPost.className = "feed-post";
+  feedPost.id = `post=${post.id}`;
+
+  // post-header, time and creator
+  const postHeader = document.createElement("div");
+  postHeader.className = "post-header";
+
+  const authorInfo = document.createElement("div");
+  authorInfo.className = "author-info";
+  // profile pic
+  if (post.image) {
+    const pfp = document.createElement("img");
+    pfp.src = post.image;
+    pfp.alt = "profile picture";
+    pfp.className = "profile-picture";
+    pfp.style.display = "inline-block";
+    authorInfo.appendChild(pfp);
+    authorInfo.style.display = "flex";
+    authorInfo.style.alignItems = "center";
+    authorInfo.style.gap = "10px";
+  }
+  const response = await apiCall(`user?userId=${post.creatorId}`,{},"GET");
+  const userName = response.name;
+
+  // create name element
+  const nameElement = document.createElement("div");
+  nameElement.className = "author-name";
+  nameElement.innerText = userName;
+      
+  // Create time element
+  const timeElement = document.createElement("div");
+  timeElement.className = "post-time";
+  const now = new Date()
+  const timeCreated = new Date(post.createdAt);
+  if ((now - timeCreated) > 86400000 ) {
+    const year = timeCreated.getFullYear();
+    const day = String(timeCreated.getDate()).padStart(2, '0');
+    const month = String(timeCreated.getMonth() + 1).padStart(2, '0');
+
+    timeElement.innerText = `${day}/${month}/${year}`;
+  } else {
+    const diffInMs = now - timeCreated;
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    const reaminderMinutes = diffInMinutes % 60;
+    timeElement.innerText = `${diffInHours} ${diffInHours > 1 ? 'hours':'hour'} and ${reaminderMinutes} ${reaminderMinutes>1? 'minutes':'minute'} ago.`
+  }
+  // Append elements to header
+  authorInfo.appendChild(nameElement);
+  postHeader.appendChild(authorInfo);
+  postHeader.appendChild(timeElement);
+  feedPost.appendChild(postHeader);
+
+  document.querySelector(".feed").appendChild(feedPost);
+}
 
 if (localStorage.getItem("token")) {
   showPage("home");
@@ -51,7 +110,6 @@ if (localStorage.getItem("token")) {
 } else {
   showPage("login");
 }
-
 
 const errorPopup = (msg) => {
   const popup = document.getElementById("popup");
@@ -83,7 +141,7 @@ submitBtn.addEventListener("click", () => {
   }
 });
 
-// signup logic
+// login logic
 const loginBtn = document.getElementById("login");
 loginBtn.addEventListener("click", () => {
   const email = document.getElementById("email-login").value;

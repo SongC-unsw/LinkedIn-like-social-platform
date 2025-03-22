@@ -29,7 +29,12 @@
           <div class="modal-content rounded-4 shadow">
             <div class="modal-header border-bottom-0">
               <h1 class="modal-title fs-5">Error Popup</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
             </div>
             <div class="modal-body py-0">
               <p></p>
@@ -84,7 +89,6 @@
             </div>
           </div>
         </div>
-
       </div>
       <div class="registration page hide">
         <div class="container">
@@ -158,13 +162,21 @@
         </div>
       </div>
       <div class="home page hide">
-        <div class="container">
-          <button class="btn btn-outline-primary" id="logout-btn">Log out</button>
-          <h1>Feed</h1>
-          <div class="feed">
-            
+        <nav class="navbar bg-white shadow-sm mb-3">
+          <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">Lruk for work</span>
+            <button class="btn btn-outline-primary" id="logout-btn">
+              Log out
+            </button>
           </div>
-
+        </nav>
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-md-8">
+              <div class="feed bg-white mb-3 shadow-sm">
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </main>
