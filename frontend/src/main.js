@@ -69,6 +69,19 @@ const handleLikes = (likeBtn, post, haveLiked) => {
     });
 });
 };
+// handle comments
+const handleComment = (commentSubmit, commentInput, post) => {
+  commentSubmit.addEventListener("click", () => {
+    if (commentInput.value){
+      apiCall("job/comment", {
+        id: post.id,
+        comment: commentInput.value,
+      }, "POST").then(console.log("ok"));
+    }
+  })
+
+}
+
 const creatPost = async (post) => {
   // async function to deal with apicall
   // post here is a response object
@@ -296,6 +309,7 @@ const creatPost = async (post) => {
 
   const commentInput = document.createElement("input");
   commentInput.type = "text";
+  commentInput.required = true;
   commentInput.classList.add("form-control", "form-control-sm", "me-2");
   commentInput.placeholder = "Add a comment...";
 
@@ -303,6 +317,8 @@ const creatPost = async (post) => {
   commentSubmit.classList.add("btn", "btn-sm", "btn-primary");
   commentSubmit.innerText = "Post";
 
+  // dynamically add comments functionality
+  handleComment(commentSubmit, commentInput, post);
   commentForm.appendChild(commentInput);
   commentForm.appendChild(commentSubmit);
   comSection.appendChild(commentForm);
