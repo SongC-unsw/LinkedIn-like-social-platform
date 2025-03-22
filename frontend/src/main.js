@@ -17,7 +17,7 @@ const apiCall = (path, body, mtd) => {
     method: mtd,
     headers: {
       "Content-type": "application/json",
-      "Authorization": token ? `Bearer ${token}` : undefined,
+      Authorization: token ? `Bearer ${token}` : undefined,
     },
     body: mtd === "GET" ? undefined : JSON.stringify(body),
   })
@@ -51,7 +51,7 @@ const creatPost = async (post) => {
   const feedPost = document.createElement("div");
   feedPost.className = "feed-post";
   feedPost.id = `post-${post.id}`;
-  feedPost.classList.add("d-flex","flex-column");
+  feedPost.classList.add("d-flex", "flex-column");
 
   const topSection = document.createElement("div");
   topSection.className = "post-top-section";
@@ -68,16 +68,17 @@ const creatPost = async (post) => {
     pfp.src = post.avatar;
     pfp.alt = "profile picture";
     pfp.className = "profile-picture";
-    pfp.classList.add("rounded-circle","img-fluid");
+    pfp.classList.add("rounded-circle", "img-fluid");
     pfp.width = "50";
     pfp.height = "50";
-
   } else {
     pfp.className = "profile-picture rounded-circle";
     pfp.style.width = "50";
     pfp.style.height = "50";
     // Create a default profile picture using SVG
-    pfp.src = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+    pfp.src =
+      "data:image/svg+xml;charset=UTF-8," +
+      encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="50" height="50">
         <rect width="100" height="100" fill="#6c757d" />
         <circle cx="50" cy="40" r="20" fill="#dee2e6" />
@@ -92,7 +93,7 @@ const creatPost = async (post) => {
   pfpContainer.appendChild(pfp);
   topSection.appendChild(pfpContainer);
 
-  const response = await apiCall(`user?userId=${post.creatorId}`,{},"GET");
+  const response = await apiCall(`user?userId=${post.creatorId}`, {}, "GET");
   const userName = response.name;
 
   // create name element
@@ -100,19 +101,20 @@ const creatPost = async (post) => {
   nameElement.className = "author-name";
   nameElement.innerText = userName;
   nameElement.classList.add("fw-bold");
-  nameElement.style.fontSize = "1.3rem"
-      
+  nameElement.style.fontSize = "1.3rem";
+
   // Create time element
   const timeElement = document.createElement("div");
   timeElement.className = "post-time";
   timeElement.classList.add("text-secondary");
-  timeElement.style.fontSize = "0.8rem"
-  const now = new Date()
+  timeElement.style.fontSize = "0.8rem";
+  const now = new Date();
   const timeCreated = new Date(post.createdAt);
-  if ((now - timeCreated) > 86400000 ) { // if greater than a day
+  if (now - timeCreated > 86400000) {
+    // if greater than a day
     const year = timeCreated.getFullYear();
-    const day = String(timeCreated.getDate()).padStart(2, '0');
-    const month = String(timeCreated.getMonth() + 1).padStart(2, '0');
+    const day = String(timeCreated.getDate()).padStart(2, "0");
+    const month = String(timeCreated.getMonth() + 1).padStart(2, "0");
 
     timeElement.innerText = `${day}/${month}/${year}`; // DD/MM/YYYY
   } else {
@@ -120,17 +122,20 @@ const creatPost = async (post) => {
     const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
     const diffInHours = Math.floor(diffInMinutes / 60);
     const reaminderMinutes = diffInMinutes % 60;
-    timeElement.innerText = `${diffInHours} ${diffInHours > 1 ? 'hours':'hour'} and ${reaminderMinutes} ${reaminderMinutes>1? 'minutes':'minute'} ago`
+    timeElement.innerText = `${diffInHours} ${
+      diffInHours > 1 ? "hours" : "hour"
+    } and ${reaminderMinutes} ${
+      reaminderMinutes > 1 ? "minutes" : "minute"
+    } ago`;
     // time display format
   }
-
 
   // top section styling
   postHeader.style.display = "flex";
   postHeader.style.flexDirection = "column";
   topSection.style.display = "flex";
-  postHeader.classList.add('ms-3'); // adds margin-left
-  topSection.classList.add('mb-3');
+  postHeader.classList.add("ms-3"); // adds margin-left
+  topSection.classList.add("mb-3");
 
   // Append elements to header
   postHeader.appendChild(nameElement);
@@ -152,31 +157,40 @@ const creatPost = async (post) => {
   jobDetail.innerText = post.description;
   //create img element
   const descriptionImg = document.createElement("img");
-  descriptionImg.classList.add("img-fluid","img-thumbnail");
+  descriptionImg.classList.add("img-fluid", "img-thumbnail");
   descriptionImg.style.width = "100%";
   descriptionImg.src = post.image;
 
   // append element to main content
-  postContent.append(postTitle,jobDetail,descriptionImg);
+  postContent.append(postTitle, jobDetail, descriptionImg);
   feedPost.appendChild(postContent);
   //comment section and likes
   const commAndLikes = document.createElement("div");
-  commAndLikes.classList.add("container", "d-flex", "justify-content-between", "align-items-center", "mt-3");
+  commAndLikes.classList.add(
+    "container",
+    "d-flex",
+    "justify-content-between",
+    "align-items-center",
+    "mt-3",
+    "px-2"
+  );
   // like button
   const likeBtn = document.createElement("button");
   const likeNum = post.likes.length;
-  likeBtn.innerText = `👍 ${likeNum>0? likeNum:""}`;
+  likeBtn.innerText = `👍 ${likeNum > 0 ? likeNum : ""}`;
   likeBtn.classList.add("btn", "btn-primary");
 
   // comment button
   const comBtn = document.createElement("button");
   const comNum = post.comments.length;
-  comBtn.innerText=`💬 ${comNum > 0 ? comNum: ""}`;
+  comBtn.innerText = `💬 ${comNum > 0 ? comNum : ""}`;
   comBtn.classList.add("btn", "btn-primary");
-  commAndLikes.append(likeBtn,comBtn);
+  // comment section
+
+  commAndLikes.append(likeBtn, comBtn);
   feedPost.appendChild(commAndLikes);
   document.querySelector(".feed").appendChild(feedPost);
-}
+};
 
 if (localStorage.getItem("token")) {
   showPage("home");
