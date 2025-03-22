@@ -40,7 +40,12 @@ const loadFeed = () => {
     document.querySelector(".feed").innerHTML = "";
     // post
     for (const post of response) {
-      creatPost(post);
+      // make sure to only show jobs start date later than today
+      const startDate = new Date(post.start);
+      const currentDate = new Date();
+      if (startDate >= currentDate) {
+        creatPost(post);
+      }
     }
   });
 };
@@ -201,8 +206,14 @@ const creatPost = async (post) => {
   descriptionImg.style.width = "100%";
   descriptionImg.src = post.image;
 
+  const startTime = new Date(post.start);
+  const formattedStartDate = startTime.toLocaleDateString('en-GB'); // DD/MM/YYYY format
+  const startTimeContainer = document.createElement("div");
+  startTimeContainer.classList.add("start-time", "bg-info", "bg-opacity-10", "px-3", "py-2","my-2", "rounded-pill", "text-primary", "fw-bold", "d-inline-block");
+  startTimeContainer.innerText = `Start Date: ${formattedStartDate}`;
+  console.log(startTime);
   // append element to main content
-  postContent.append(postTitle, jobDetail, descriptionImg);
+  postContent.append(postTitle, startTimeContainer, jobDetail, descriptionImg);
   feedPost.appendChild(postContent);
   //comment section and likes
   const commAndLikes = document.createElement("div");
