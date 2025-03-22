@@ -163,13 +163,13 @@ const creatPost = async (post) => {
     const day = String(timeCreated.getDate()).padStart(2, "0");
     const month = String(timeCreated.getMonth() + 1).padStart(2, "0");
 
-    timeElement.innerText = `${day}/${month}/${year}`; // DD/MM/YYYY
+    timeElement.innerText = `Posted on ${day}/${month}/${year}`; // DD/MM/YYYY
   } else {
     const diffInMs = now - timeCreated;
     const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
     const diffInHours = Math.floor(diffInMinutes / 60);
     const reaminderMinutes = diffInMinutes % 60;
-    timeElement.innerText = `${diffInHours} ${
+    timeElement.innerText = `Posted ${diffInHours} ${
       diffInHours > 1 ? "hours" : "hour"
     } and ${reaminderMinutes} ${
       reaminderMinutes > 1 ? "minutes" : "minute"
