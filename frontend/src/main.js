@@ -60,20 +60,28 @@ const updateLikeBtn = (likeBtn, haveLiked) => {
     likeBtn.classList.add("btn-primary");
   }
 }
-const handleLikes = (likeBtn, post, haveLiked) => {
+const handleLikes = (likeBtn, likeBy, post, currentUserName, haveLiked) => {
   let currentCount = post.likes.length;
+  let currentLikedBy = post.likes.map(like => like.userName);
   likeBtn.addEventListener("click", () => {
+    haveLiked = !haveLiked;
+    // new state begins
+    updateLikeBtn(likeBtn, haveLiked);
+    if (haveLiked) {
+      if (!currentLikedBy.includes(currentUserName)) {
+      currentLikedBy.unshift(currentUserName);
+      }
+    } else {
+      currentLikedBy = currentLikedBy.filter(name => name !== currentUserName);
+    }
+    likeBy.innerText = currentLikedBy.length > 0 ? `Liked by: ${currentLikedBy.join(', ')}` : 'No likes yet';
+    // console.log(haveLiked, currentCount);
+    currentCount = haveLiked? currentCount+1 : currentCount-1;
+    likeBtn.innerText = `👍 ${currentCount > 0 ? currentCount : ''}`;
     apiCall("job/like", {
       id: post.id,
-      turnon: !haveLiked
-    }, "PUT")
-    .then(() => {
-      haveLiked = !haveLiked;
-      updateLikeBtn(likeBtn, haveLiked);
-      // Update the like count
-      currentCount = haveLiked? currentCount+1 : currentCount -1;
-      likeBtn.innerText = `👍 ${currentCount > 0 ? currentCount : ''}`;
-    });
+      turnon: haveLiked
+    }, "PUT");
 });
 };
 // handle comments
@@ -139,14 +147,14 @@ const creatPost = async (post) => {
   topSection.appendChild(pfpContainer);
 
   const response = await apiCall(`user?userId=${post.creatorId}`, {}, "GET");
-  console.log(response);
-
-  const userName = response.name;
+  const currentUserObj = await apiCall(`user?userId=${localStorage.getItem("userId")}`, {}, "GET");
+  const currentUserName = currentUserObj.name;
+  const creatorName = response.name;
 
   // create name element
   const nameElement = document.createElement("div");
   nameElement.className = "author-name";
-  nameElement.innerText = userName;
+  nameElement.innerText = creatorName;
   nameElement.classList.add("fw-bold");
   nameElement.style.fontSize = "1.3rem";
 
@@ -233,16 +241,24 @@ const creatPost = async (post) => {
   likeBtn.innerText = `👍 ${likeNum > 0 ? likeNum : ""}`;
   likeBtn.type = "button";
   likeBtn.classList.add("btn", "btn-primary");
+
+  // liked by section
+  const likeBy = document.createElement("div");
+  likeBy.className = "like-by";
+  likeBy.classList.add("text-muted", "small", "mt-3", "mb-2", "d-block");
   // New likes
   let haveLiked = false;
+  let likeByContent = [];
+  likeByContent = post.likes.map(like => like.userName);
   for (const e of post.likes) {
     if (String(e.userId) === localStorage.getItem("userId")) {
       haveLiked = true;
       break;
     }
   }
+  likeBy.innerText = likeByContent.length > 0 ? `Liked by: ${likeByContent.join(', ')}` : 'No likes yet';
   updateLikeBtn(likeBtn, haveLiked);
-  handleLikes(likeBtn, post, haveLiked);
+  handleLikes(likeBtn, likeBy, post, currentUserName, haveLiked);
 
   // comment button
   const comBtn = document.createElement("button");
@@ -343,6 +359,7 @@ const creatPost = async (post) => {
 
   commAndLikes.append(likeBtn, comBtn);
   feedPost.appendChild(commAndLikes);
+  feedPost.appendChild(likeBy);
   feedPost.appendChild(comSection);
   document.querySelector(".feed").appendChild(feedPost);
 };
