@@ -86,6 +86,8 @@ const handleLikes = (likeBtn, likeBy, post, currentUserName, haveLiked) => {
 };
 // handle comments
 const handleComment = (commentSubmit, commentInput, post) => {
+  // TODO1 update comment in real-time once posted
+  // TODO2 delete comment
   commentSubmit.addEventListener("click", () => {
     if (commentInput.value){
       apiCall("job/comment", {
