@@ -128,13 +128,13 @@ const createComment = (comment) => {
   commentItem.appendChild(commentContent);
   
   return commentItem;
-}
+};
 // handle comments
 const handlePostComment = (commentSubmit, commentInput, currentUserName, commentsList, comBtn, post) => {
   commentSubmit.addEventListener("click", () => {
     if (commentInput.value){
       // add comment
-      const body = {userName: currentUserName,comment: commentInput.value}
+      const body = {userId: localStorage.getItem("userId"),userName: currentUserName,comment: commentInput.value}
       commentsList.appendChild(createComment(body));
       comBtn.innerText = `💬 ${parseInt(comBtn.innerText.replace(/[^0-9]/g, '') || 0) + 1}`;
       // api call
@@ -144,6 +144,9 @@ const handlePostComment = (commentSubmit, commentInput, currentUserName, comment
       }, "POST").then(console.log("ok"));
     }
   })
+
+};
+const handleDelComment = () => {
 
 }
 
@@ -165,21 +168,21 @@ const creatPost = async (post) => {
   postHeader.className = "post-header";
 
   // profile pic
-  const pfp = document.createElement("img");
+  const profilePic = document.createElement("img");
 
   if (post.avatar) {
-    pfp.src = post.avatar;
-    pfp.alt = "profile picture";
-    pfp.className = "profile-picture";
-    pfp.classList.add("rounded-circle", "img-fluid");
-    pfp.width = "50";
-    pfp.height = "50";
+    profilePic.src = post.avatar;
+    profilePic.alt = "profile picture";
+    profilePic.className = "profile-picture";
+    profilePic.classList.add("rounded-circle", "img-fluid");
+    profilePic.width = "50";
+    profilePic.height = "50";
   } else {
-    pfp.className = "profile-picture rounded-circle";
-    pfp.style.width = "50";
-    pfp.style.height = "50";
+    profilePic.className = "profile-picture rounded-circle";
+    profilePic.style.width = "50";
+    profilePic.style.height = "50";
     // Create a default profile picture using SVG
-    pfp.src =
+    profilePic.src =
       "data:image/svg+xml;charset=UTF-8," +
       encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="50" height="50">
@@ -188,12 +191,12 @@ const creatPost = async (post) => {
         <circle cx="50" cy="100" r="40" fill="#dee2e6" />
       </svg>
     `);
-    pfp.alt = "default profile picture";
+    profilePic.alt = "default profile picture";
   }
   const pfpContainer = document.createElement("div");
   pfpContainer.style.width = "60px";
   pfpContainer.style.flexShrink = "0";
-  pfpContainer.appendChild(pfp);
+  pfpContainer.appendChild(profilePic);
   topSection.appendChild(pfpContainer);
 
   const response = await apiCall(`user?userId=${post.creatorId}`, {}, "GET");
@@ -357,6 +360,7 @@ const creatPost = async (post) => {
 
   // dynamically add comments functionality
   handlePostComment(commentSubmit, commentInput, currentUserName, commentsList, comBtn, post);
+  handleDelComment();
   commentForm.appendChild(commentInput);
   commentForm.appendChild(commentSubmit);
   comSection.appendChild(commentForm);
