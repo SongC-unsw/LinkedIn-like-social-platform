@@ -114,23 +114,12 @@ const createComment = (comment) => {
   commentContent.classList.add("comment-content", "flex-grow-1");
   // Comment user name
   const commentUser = document.createElement("div");
-  commentUser.classList.add("comment-user", "fw-bold", "small", "d-flex","align-items-center");
+  commentUser.classList.add("comment-user", "fw-bold", "small");
   commentUser.innerText = comment.userName;
 
   const commentText = document.createElement("div");
   commentText.classList.add("comment-text", "small");
   commentText.innerText = comment.comment;
-  // del button
-  const commentDelBtn = document.createElement("div");
-  commentDelBtn.className = "comment-del-button text-muted small text-decoration-underline ms-auto hide";
-  commentDelBtn.style.cursor = "pointer";
-  commentDelBtn.onmouseover = () => { commentDelBtn.classList.replace("text-muted", "text-danger"); };
-  commentDelBtn.onmouseout = () => { commentDelBtn.classList.replace("text-danger", "text-muted"); };
-  commentDelBtn.innerText = "Delete";
-  commentUser.appendChild(commentDelBtn);
-  if (comment.userId === parseInt(localStorage.getItem("userId"))) {
-    commentDelBtn.classList.remove("hide");
-  }
   // assemble comment section
   commentContent.appendChild(commentUser);
   commentContent.appendChild(commentText);
@@ -156,9 +145,6 @@ const handlePostComment = (commentSubmit, commentInput, currentUserName, comment
   })
 
 };
-const handleDelComment = () => {
-
-}
 
 const creatPost = async (post) => {
   // async function to deal with apicall
@@ -370,7 +356,6 @@ const creatPost = async (post) => {
 
   // dynamically add comments functionality
   handlePostComment(commentSubmit, commentInput, currentUserName, commentsList, comBtn, post);
-  handleDelComment();
   commentForm.appendChild(commentInput);
   commentForm.appendChild(commentSubmit);
   comSection.appendChild(commentForm);
