@@ -440,3 +440,7 @@ logoutBtn.addEventListener("click", () => {
   localStorage.clear();
   showPage("login");
 });
+const homePageBtn = document.querySelector(".home-page-button");
+homePageBtn.addEventListener("click", () => {
+  showPage("home");
+})
