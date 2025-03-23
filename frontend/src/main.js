@@ -130,14 +130,13 @@ const createComment = (comment) => {
   return commentItem;
 }
 // handle comments
-const handleComment = (commentSubmit, commentInput, currentUserName, commentsList, post) => {
-  // TODO1 update comment in real-time once posted
-  // TODO2 delete comment
+const handlePostComment = (commentSubmit, commentInput, currentUserName, commentsList, comBtn, post) => {
   commentSubmit.addEventListener("click", () => {
     if (commentInput.value){
       // add comment
       const body = {userName: currentUserName,comment: commentInput.value}
       commentsList.appendChild(createComment(body));
+      comBtn.innerText = `💬 ${parseInt(comBtn.innerText.replace(/[^0-9]/g, '') || 0) + 1}`;
       // api call
       apiCall("job/comment", {
         id: post.id,
@@ -357,7 +356,7 @@ const creatPost = async (post) => {
   commentSubmit.innerText = "Post";
 
   // dynamically add comments functionality
-  handleComment(commentSubmit, commentInput, currentUserName, commentsList, post);
+  handlePostComment(commentSubmit, commentInput, currentUserName, commentsList, comBtn, post);
   commentForm.appendChild(commentInput);
   commentForm.appendChild(commentSubmit);
   comSection.appendChild(commentForm);
