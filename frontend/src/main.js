@@ -130,17 +130,14 @@ const createComment = (comment) => {
   return commentItem;
 }
 // handle comments
-const handleComment = (commentSubmit, commentInput, currentUserName, comSection, feedPost, post) => {
+const handleComment = (commentSubmit, commentInput, currentUserName, commentsList, post) => {
   // TODO1 update comment in real-time once posted
   // TODO2 delete comment
   commentSubmit.addEventListener("click", () => {
     if (commentInput.value){
       // add comment
       const body = {userName: currentUserName,comment: commentInput.value}
-      post.comments.push(body);
-      console.log(post.comments);
-      const newComSection = createComment(post.comments);
-
+      commentsList.appendChild(createComment(body));
       // api call
       apiCall("job/comment", {
         id: post.id,
@@ -331,9 +328,9 @@ const creatPost = async (post) => {
     "rounded",
     "hide"
   );
+  const commentsList = document.createElement("div");
+  commentsList.classList.add("comments-list");
   if (post.comments.length > 0) {
-    const commentsList = document.createElement("div");
-    commentsList.classList.add("comments-list");
     for (const comment of post.comments) {
       commentsList.appendChild(createComment(comment));
     }
@@ -360,7 +357,7 @@ const creatPost = async (post) => {
   commentSubmit.innerText = "Post";
 
   // dynamically add comments functionality
-  handleComment(commentSubmit, commentInput, currentUserName, comSection, feedPost, post);
+  handleComment(commentSubmit, commentInput, currentUserName, commentsList, post);
   commentForm.appendChild(commentInput);
   commentForm.appendChild(commentSubmit);
   comSection.appendChild(commentForm);
