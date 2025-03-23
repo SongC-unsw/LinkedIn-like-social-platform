@@ -340,7 +340,7 @@ const creatPost = async (post) => {
   comBtn.innerText = `💬 ${comNum > 0 ? comNum : ""}`;
   comBtn.classList.add("btn", "btn-primary");
   // comment section
-
+  const comSection = createComment(post.comments);
   // Add new comment
   const commentForm = document.createElement("div");
   commentForm.classList.add("comment-form", "mt-3", "d-flex");
