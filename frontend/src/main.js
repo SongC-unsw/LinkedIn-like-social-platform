@@ -84,12 +84,84 @@ const handleLikes = (likeBtn, likeBy, post, currentUserName, haveLiked) => {
     }, "PUT");
 });
 };
+
+const createComment = (commentInput) => {
+  const comSection = document.createElement("div");
+  comSection.classList.add(
+    "comment-section",
+    "container",
+    "bg-light",
+    "p-3",
+    "mt-2",
+    "rounded",
+    "hide"
+  );
+
+  // Display existing comments
+  if (commentInput.length > 0) {
+    const commentsList = document.createElement("div");
+    commentsList.classList.add("comments-list");
+
+    for (const comment of commentInput) {
+      const commentItem = document.createElement("div");
+      commentItem.classList.add(
+        "comment-item",
+        "d-flex",
+        "mb-2",
+        "pb-2",
+        "border-bottom"
+      );
+      // Comment user avatar (placeholder)
+      const commentAvatar = document.createElement("div");
+      commentAvatar.classList.add("comment-avatar", "me-2");
+      const avatarContainer = document.createElement("div");
+      avatarContainer.className =
+        "rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center";
+      avatarContainer.style.width = "32px";
+      avatarContainer.style.height = "32px";
+      avatarContainer.style.fontSize = "14px";
+      avatarContainer.textContent = comment.userName
+        ? comment.userName.charAt(0)
+        : "U";
+      commentAvatar.appendChild(avatarContainer);
+
+      // Comment content
+      const commentContent = document.createElement("div");
+      commentContent.classList.add("comment-content", "flex-grow-1");
+      // Comment user name
+      const commentUser = document.createElement("div");
+      commentUser.classList.add("comment-user", "fw-bold", "small");
+      commentUser.innerText = comment.userName;
+
+      const commentText = document.createElement("div");
+      commentText.classList.add("comment-text", "small");
+      commentText.innerText = comment.comment;
+      // assemble comment section
+      commentContent.appendChild(commentUser);
+      commentContent.appendChild(commentText);
+      commentItem.appendChild(commentAvatar);
+      commentItem.appendChild(commentContent);
+      commentsList.appendChild(commentItem);
+    }
+
+    comSection.appendChild(commentsList);
+  } else {
+    const noComments = document.createElement("p");
+    noComments.classList.add("text-muted", "small", "fst-italic");
+    noComments.innerText = "No comments yet";
+    comSection.appendChild(noComments);
+  }
+  return comSection;
+}
 // handle comments
 const handleComment = (commentSubmit, commentInput, post) => {
   // TODO1 update comment in real-time once posted
   // TODO2 delete comment
   commentSubmit.addEventListener("click", () => {
     if (commentInput.value){
+      // add comment
+
+      // api call
       apiCall("job/comment", {
         id: post.id,
         comment: commentInput.value,
