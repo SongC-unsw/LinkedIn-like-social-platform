@@ -85,10 +85,9 @@ const handleLikes = (likeBtn, likeBy, post, currentUserName, haveLiked) => {
 });
 };
 
-const createComment = (commentInput) => {
+const createComment = (comment) => {
   // Display existing comments
-  const commentsList = document.createElement("div");
-  commentsList.classList.add("comments-list");
+
   const commentItem = document.createElement("div");
   commentItem.classList.add(
     "comment-item",
@@ -127,12 +126,8 @@ const createComment = (commentInput) => {
   commentContent.appendChild(commentText);
   commentItem.appendChild(commentAvatar);
   commentItem.appendChild(commentContent);
-  commentsList.appendChild(commentItem);
   
-
-    comSection.appendChild(commentsList);
-  
-  return comSection;
+  return commentItem;
 }
 // handle comments
 const handleComment = (commentSubmit, commentInput, currentUserName, comSection, feedPost, post) => {
@@ -336,6 +331,20 @@ const creatPost = async (post) => {
     "rounded",
     "hide"
   );
+  if (post.comments.length > 0) {
+    const commentsList = document.createElement("div");
+    commentsList.classList.add("comments-list");
+    for (const comment of post.comments) {
+      commentsList.appendChild(createComment(comment));
+    }
+    comSection.appendChild(commentsList);
+
+  } else {
+    const noComments = document.createElement("p");
+    noComments.classList.add("text-muted", "small", "fst-italic");
+    noComments.innerText = "No comments yet";
+    comSection.appendChild(noComments);
+  }
   // Add new comment
   const commentForm = document.createElement("div");
   commentForm.classList.add("comment-form", "mt-3", "d-flex");
