@@ -116,9 +116,13 @@ const createComment = (comment) => {
   const commentUser = document.createElement("div");
   commentUser.classList.add("comment-user", "fw-bold", "small");
   commentUser.innerText = comment.userName;
+  commentUser.style.cursor = "pointer";
+  commentUser.addEventListener("click", () => {
+    showPage("profile");
+  })
 
   const commentText = document.createElement("div");
-  commentText.classList.add("comment-text", "small");
+  commentText.classList.add("comment-text", "small","text-break","text-wrap");
   commentText.innerText = comment.comment;
   // assemble comment section
   commentContent.appendChild(commentUser);
@@ -162,43 +166,27 @@ const creatPost = async (post) => {
   // post-header, time and creator name
   const postHeader = document.createElement("div");
   postHeader.className = "post-header";
+  
+  const response = await apiCall(`user?userId=${post.creatorId}`, {}, "GET");
+  const currentUserObj = await apiCall(`user?userId=${localStorage.getItem("userId")}`, {}, "GET");
+  const currentUserName = currentUserObj.name;
+  const creatorName = response.name;
 
   // profile pic
-  const profilePic = document.createElement("img");
+  const profilePic = document.createElement("div");
+  console.log(post);
 
-  if (post.avatar) {
-    profilePic.src = post.avatar;
-    profilePic.alt = "profile picture";
-    profilePic.className = "profile-picture";
-    profilePic.classList.add("rounded-circle", "img-fluid");
-    profilePic.width = "50";
-    profilePic.height = "50";
-  } else {
-    profilePic.className = "profile-picture rounded-circle";
-    profilePic.style.width = "50";
-    profilePic.style.height = "50";
-    // Create a default profile picture using SVG
-    profilePic.src =
-      "data:image/svg+xml;charset=UTF-8," +
-      encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="50" height="50">
-        <rect width="100" height="100" fill="#6c757d" />
-        <circle cx="50" cy="40" r="20" fill="#dee2e6" />
-        <circle cx="50" cy="100" r="40" fill="#dee2e6" />
-      </svg>
-    `);
-    profilePic.alt = "default profile picture";
-  }
+  profilePic.className = "profile-picture rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center";
+  profilePic.style.width = "50px";
+  profilePic.style.height = "50px";
+  profilePic.style.fontSize = "1.3rem";
+  profilePic.textContent = creatorName ? creatorName.charAt(0) : "U";
+  
   const pfpContainer = document.createElement("div");
   pfpContainer.style.width = "60px";
   pfpContainer.style.flexShrink = "0";
   pfpContainer.appendChild(profilePic);
   topSection.appendChild(pfpContainer);
-
-  const response = await apiCall(`user?userId=${post.creatorId}`, {}, "GET");
-  const currentUserObj = await apiCall(`user?userId=${localStorage.getItem("userId")}`, {}, "GET");
-  const currentUserName = currentUserObj.name;
-  const creatorName = response.name;
 
   // create name element
   const nameElement = document.createElement("div");
