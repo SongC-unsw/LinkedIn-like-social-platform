@@ -28,30 +28,49 @@ const apiCall = (path, body, mtd) => {
         // return Promise.reject(new Error(data.error));
       } else {
         return Promise.resolve(data);
-        // or handle the data here
       }
     });
 };
 
 // feed logic
-const loadFeed = () => {
+const loadFeed = (feed) => {
   // after login or signup, token set
   apiCall("job/feed/?start=0", {}, "GET").then((response) => {
+    console.log("we are testing")
     console.log(response);
-    document.querySelector(".feed").innerHTML = "";
+    document.querySelector(feed).innerHTML = "";
     // post
+    response.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     for (const post of response) {
       // make sure to only show jobs start date later than today
       // Sort posts by creation date, newest first
-      response.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       const startDate = new Date(post.start);
       const currentDate = new Date();
       if (startDate >= currentDate) {
-        creatPost(post);
+        creatPost(post, feed);
       }
     }
   });
 };
+const loadJob = (userResponse) => {
+  document.querySelector(".job-posted-container").innerHTML = "";
+  if (!userResponse.jobs || userResponse.jobs.length === 0) {
+    const noJobsMessage = document.createElement("div");
+    noJobsMessage.className = "alert alert-info text-center";
+    noJobsMessage.innerText = "No jobs posted yet";
+    document.querySelector(".job-posted-container").appendChild(noJobsMessage);
+    return;
+  }
+  const jobs = userResponse.jobs;
+  jobs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  for (const post of jobs) {
+    const startDate = new Date(post.start);
+    const currentDate = new Date();
+    if (startDate >= currentDate) {
+      creatPost(post, ".job-posted-container");
+    }
+  }
+}
 const updateLikeBtn = (likeBtn, haveLiked) => {
   if (haveLiked) {
     likeBtn.classList.remove("btn-primary");
@@ -166,7 +185,7 @@ const handlePostComment = (commentSubmit, commentInput, currentUserName, comment
 
 };
 
-const creatPost = async (post) => {
+const creatPost = async (post, feed) => {
   // async function to deal with apicall
   // post here is a response object
   console.log(post);
@@ -393,7 +412,7 @@ const creatPost = async (post) => {
   feedPost.appendChild(commAndLikes);
   feedPost.appendChild(likeBy);
   feedPost.appendChild(comSection);
-  document.querySelector(".feed").appendChild(feedPost);
+  document.querySelector(feed).appendChild(feedPost);
 };
 
 // profile page logic
@@ -403,6 +422,7 @@ const constructProfilePage = async (userResponse) => {
   const emailDetail = document.querySelector(".profile-email-value");
   const watchCount = document.querySelector(".profile-watch-count");
   const followedBy = document.querySelector(".followed-by-name");
+  const jobPostedContainer = document.querySelector(".job-posted-container");
   const userWhoWatchMeIds = userResponse.usersWhoWatchMeUserIds;
   let followedByName = [];
   for (const id of userWhoWatchMeIds) {
@@ -477,6 +497,9 @@ const constructProfilePage = async (userResponse) => {
       followBtnContainer.appendChild(followBtn);
     }
   }
+  // job-posting made by this person
+  loadJob(userResponse);
+
   
   console.log(userResponse);
 }
@@ -495,7 +518,7 @@ const updateFollowBtn = (btn, isFollowing) => {
 
 if (localStorage.getItem("token")) {
   showPage("home");
-  loadFeed();
+  loadFeed(".feed");
 } else {
   showPage("login");
 }
@@ -526,7 +549,7 @@ submitBtn.addEventListener("click", () => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.userId);
       showPage("home");
-      loadFeed();
+      loadFeed(".feed");
     });
   }
 });
@@ -545,7 +568,7 @@ loginBtn.addEventListener("click", (event) => {
     localStorage.setItem("token", response.token);
     localStorage.setItem("userId", response.userId);
     showPage("home");
-    loadFeed();
+    loadFeed(".feed");
   });
 });
 
