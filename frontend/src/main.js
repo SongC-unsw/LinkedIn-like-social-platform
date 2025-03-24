@@ -403,7 +403,7 @@ const constructProfilePage = async (userResponse) => {
   const watchCount = document.querySelector(".profile-watch-count");
   const followedBy = document.querySelector(".followed-by-name");
   const userWhoWatchMeIds = userResponse.usersWhoWatchMeUserIds;
-  const followedByName = [];
+  let followedByName = [];
   for (const id of userWhoWatchMeIds) {
     const user = await apiCall(`user?userId=${id}`,{},"GET");
     if (user && user.name) {
@@ -424,7 +424,7 @@ const constructProfilePage = async (userResponse) => {
   if (userResponse.image) {
     const profileImg = document.createElement("img");
     profileImg.className = "profile-image";
-    profileImg.src = response.image;
+    profileImg.src = userResponse.image;
     profileImg.style.width = "70px";
     profileImg.style.height = "70px";
     avatarContainer.classList.remove("bg-secondary");
@@ -433,8 +433,65 @@ const constructProfilePage = async (userResponse) => {
   } else {
     avatarContainer.textContent = userResponse.name ? userResponse.name.charAt(0) : "U";
   }
+  
+  // follow button logic
+  const followBtnContainer = document.querySelector(".profile-follow-btn-container");
+  if (followBtnContainer) {
+    followBtnContainer.innerHTML = "";
+    
+    const currentUserId = parseInt(localStorage.getItem("userId"));
+    const currentUserObj = await apiCall(`user?userId=${currentUserId}`);
+    const currentUserName = currentUserObj.name;
+    if (userResponse.id !== currentUserId) {
+      const followBtn = document.createElement("button");
+      followBtn.className = "btn btn-primary";
+      
+      // check if is following
+      let isFollowing = userResponse.usersWhoWatchMeUserIds.includes(currentUserId);
+      updateFollowBtn(followBtn, isFollowing);
+      
+      // followBtn functionality
+      followBtn.addEventListener("click", async () => {
+        isFollowing = !isFollowing;
+        updateFollowBtn(followBtn, isFollowing);
+        
+        await apiCall("user/watch", {
+          email: userResponse.email,
+          turnon: isFollowing
+        }, "PUT");
+        
+        // update watch count
+        const updatedUser = await apiCall(`user?userId=${userResponse.id}`, {}, "GET");
+        watchCount.innerText = updatedUser.usersWhoWatchMeUserIds.length;
+        if (isFollowing) {
+          if (!followedByName.includes(currentUserName)) {
+            followedByName.unshift(currentUserName);
+          }
+        } else {
+          followedByName = followedByName.filter(name => name !== currentUserName)
+        }
+        followedBy.innerText = followedByName;
+      });
+      
+      followBtnContainer.appendChild(followBtn);
+    }
+  }
+  
   console.log(userResponse);
 }
+
+const updateFollowBtn = (btn, isFollowing) => {
+  if (isFollowing) {
+    btn.innerText = "👀 Watching Now";
+    btn.classList.remove("btn-primary");
+    btn.classList.add("btn-success");
+  } else {
+    btn.innerText = "👀 Watch";
+    btn.classList.remove("btn-success");
+    btn.classList.add("btn-primary");
+  }
+}
+
 if (localStorage.getItem("token")) {
   showPage("home");
   loadFeed();
