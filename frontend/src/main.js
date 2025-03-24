@@ -206,17 +206,20 @@ const creatPost = async (post) => {
   }
   
   const pfpContainer = document.createElement("div");
-  pfpContainer.style.width = "60px";
+  pfpContainer.style.width = "50px";
   pfpContainer.style.flexShrink = "0";
   pfpContainer.appendChild(profilePic);
   topSection.appendChild(pfpContainer);
 
   // create name element
   const nameElement = document.createElement("div");
-  nameElement.className = "author-name";
+  nameElement.className = "author-name fw-bold";
   nameElement.innerText = creatorName;
-  nameElement.classList.add("fw-bold");
+  nameElement.style.cursor = "pointer";
   nameElement.style.fontSize = "1.3rem";
+  nameElement.addEventListener("click", ()=>{
+    showPage("profile");
+  })
 
   // Create time element
   const timeElement = document.createElement("div");
