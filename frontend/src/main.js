@@ -24,7 +24,6 @@ const apiCall = (path, body, mtd) => {
     .then((response) => response.json())
     .then((data) => {
       if (data.error) {
-        // console.log("err");
         errorPopup(data.error);
         // return Promise.reject(new Error(data.error));
       } else {
@@ -534,7 +533,8 @@ submitBtn.addEventListener("click", () => {
 
 // login logic
 const loginBtn = document.getElementById("login");
-loginBtn.addEventListener("click", () => {
+loginBtn.addEventListener("click", (event) => {
+  event.preventDefault();
   const email = document.getElementById("email-login").value;
   const password = document.getElementById("password-login").value;
   const Data = {
