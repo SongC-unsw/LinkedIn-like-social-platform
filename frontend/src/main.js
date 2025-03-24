@@ -174,13 +174,22 @@ const creatPost = async (post) => {
 
   // profile pic
   const profilePic = document.createElement("div");
-  console.log(post);
-
   profilePic.className = "profile-picture rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center";
   profilePic.style.width = "50px";
   profilePic.style.height = "50px";
   profilePic.style.fontSize = "1.3rem";
-  profilePic.textContent = creatorName ? creatorName.charAt(0) : "U";
+  if (response.image) {
+    const profileImg = document.createElement("img");
+    profileImg.className = "profile-image";
+    profileImg.src = response.image;
+    profileImg.style.width = "50px";
+    profileImg.style.height = "50px";
+    profilePic.classList.remove("bg-secondary");
+    profileImg.classList.add("rounded-circle");
+    profilePic.appendChild(profileImg);    
+  } else {
+    profilePic.textContent = creatorName ? creatorName.charAt(0) : "U";
+  }
   
   const pfpContainer = document.createElement("div");
   pfpContainer.style.width = "60px";
