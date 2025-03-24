@@ -1,18 +1,18 @@
 /* base styles, feel free to edit */
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: Arial;
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial;
 }
-
 
 .hide {
-    display: none;
+  display: none;
 }
 .avatar-profile-edit {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border: 2px solid #ddd;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border: 2px solid #ddd;
 }
