@@ -562,7 +562,6 @@ for (const element of logoutBtn) {
   element.addEventListener("click", () => {
     localStorage.clear();
     showPage("login");
-
   });
 };
 const homePageBtn = document.getElementsByClassName("home-page-button");
