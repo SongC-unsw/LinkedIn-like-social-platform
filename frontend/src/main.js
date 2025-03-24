@@ -130,6 +130,7 @@ const createComment = async (comment) => {
   commentUser.innerText = comment.userName;
   commentUser.style.cursor = "pointer";
   commentUser.addEventListener("click", () => {
+    constructProfilePage(userResponse);
     showPage("profile");
   })
 
@@ -218,6 +219,7 @@ const creatPost = async (post) => {
   nameElement.style.cursor = "pointer";
   nameElement.style.fontSize = "1.3rem";
   nameElement.addEventListener("click", ()=>{
+    constructProfilePage(response);
     showPage("profile");
   })
 
@@ -393,6 +395,46 @@ const creatPost = async (post) => {
   document.querySelector(".feed").appendChild(feedPost);
 };
 
+// profile page logic
+const constructProfilePage = async (userResponse) => {
+  const profilePagePic = document.querySelector(".profile-page-pic");
+  const profileName = document.querySelector(".profile-page-username");
+  const emailDetail = document.querySelector(".profile-email-value");
+  const watchCount = document.querySelector(".profile-watch-count");
+  const followedBy = document.querySelector(".followed-by-name");
+  const userWhoWatchMeIds = userResponse.usersWhoWatchMeUserIds;
+  const followedByName = [];
+  for (const id of userWhoWatchMeIds) {
+    const user = await apiCall(`user?userId=${id}`,{},"GET");
+    if (user && user.name) {
+      followedByName.push(user.name);
+    }
+  }
+
+  followedBy.innerText = followedByName.join(", ");
+  emailDetail.innerText = userResponse.email;
+  watchCount.innerText = userWhoWatchMeIds.length;
+  profilePagePic.replaceChildren();
+  profileName.innerText = userResponse.name;
+  const avatarContainer = document.createElement("div");
+  profilePagePic.appendChild(avatarContainer);
+  avatarContainer.className = "profile-avatar-container rounded-circle bg-secondary fs-3 text-white d-flex justify-content-center align-items-center";
+  avatarContainer.style.width = "70px";
+  avatarContainer.style.height = "70px";
+  if (userResponse.image) {
+    const profileImg = document.createElement("img");
+    profileImg.className = "profile-image";
+    profileImg.src = response.image;
+    profileImg.style.width = "70px";
+    profileImg.style.height = "70px";
+    avatarContainer.classList.remove("bg-secondary");
+    profileImg.classList.add("rounded-circle");
+    avatarContainer.appendChild(profileImg);    
+  } else {
+    avatarContainer.textContent = userResponse.name ? userResponse.name.charAt(0) : "U";
+  }
+  console.log(userResponse);
+}
 if (localStorage.getItem("token")) {
   showPage("home");
   loadFeed();
