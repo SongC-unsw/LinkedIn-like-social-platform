@@ -85,7 +85,7 @@ const handleLikes = (likeBtn, likeBy, post, currentUserName, haveLiked) => {
 });
 };
 
-const createComment = (comment) => {
+const createComment = async (comment) => {
   // Display existing comments
   const commentItem = document.createElement("div");
   commentItem.classList.add(
@@ -96,6 +96,8 @@ const createComment = (comment) => {
     "border-bottom"
   );
   // Comment user avatar (placeholder)
+  const userResponse = await apiCall(`user?userId=${comment.userId}`,{},"GET");
+  const userAvatar = userResponse.image;
   const commentAvatar = document.createElement("div");
   commentAvatar.classList.add("comment-avatar", "me-2");
   const avatarContainer = document.createElement("div");
@@ -104,9 +106,19 @@ const createComment = (comment) => {
   avatarContainer.style.width = "32px";
   avatarContainer.style.height = "32px";
   avatarContainer.style.fontSize = "14px";
-  avatarContainer.textContent = comment.userName
-    ? comment.userName.charAt(0)
-    : "U";
+  if (userAvatar) {
+    const userCommentImg = document.createElement("img");
+    userCommentImg.className = "user-comment-image rounded-circle";
+    userCommentImg.alt = "user-profile-img";
+    userCommentImg.style.width = "32px";
+    userCommentImg.style.width = "32px";
+    userCommentImg.src = userAvatar;
+    avatarContainer.appendChild(userCommentImg);
+  } else {
+    avatarContainer.textContent = comment.userName
+      ? comment.userName.charAt(0)
+      : "U";
+  }
   commentAvatar.appendChild(avatarContainer);
 
   // Comment content
@@ -134,17 +146,19 @@ const createComment = (comment) => {
 };
 // handle comments
 const handlePostComment = (commentSubmit, commentInput, currentUserName, commentsList, comBtn, post) => {
-  commentSubmit.addEventListener("click", () => {
+  commentSubmit.addEventListener("click", async () => {
     if (commentInput.value){
       // add comment
       const body = {userId: localStorage.getItem("userId"),userName: currentUserName,comment: commentInput.value}
-      commentsList.appendChild(createComment(body));
+      const commentElement = await createComment(body);
+      commentsList.appendChild(commentElement);
       comBtn.innerText = `💬 ${parseInt(comBtn.innerText.replace(/[^0-9]/g, '') || 0) + 1}`;
       // api call
       apiCall("job/comment", {
         id: post.id,
         comment: commentInput.value,
-      }, "POST").then(console.log("ok"));
+      }, "POST");
+      commentInput.value = '';
     }
   })
 
@@ -325,18 +339,25 @@ const creatPost = async (post) => {
   );
   const commentsList = document.createElement("div");
   commentsList.classList.add("comments-list");
-  if (post.comments.length > 0) {
-    for (const comment of post.comments) {
-      commentsList.appendChild(createComment(comment));
-    }
-    comSection.appendChild(commentsList);
 
-  } else {
+  if (post.comments.length === 0) {
+    // 如果没有评论，显示提示信息
     const noComments = document.createElement("p");
     noComments.classList.add("text-muted", "small", "fst-italic");
     noComments.innerText = "No comments yet";
     comSection.appendChild(noComments);
   }
+  
+  if (post.comments.length > 0) {
+    (async () => {    
+      for (const comment of post.comments) {
+        const commentElement = await createComment(comment);
+        commentsList.appendChild(commentElement);
+      }
+    })();
+  }
+  
+  comSection.appendChild(commentsList);
   // Add new comment
   const commentForm = document.createElement("div");
   commentForm.classList.add("comment-form", "mt-3", "d-flex");
@@ -437,7 +458,9 @@ logoutBtn.addEventListener("click", () => {
   localStorage.clear();
   showPage("login");
 });
-const homePageBtn = document.querySelector(".home-page-button");
-homePageBtn.addEventListener("click", () => {
-  showPage("home");
-})
+const homePageBtn = document.getElementsByClassName("home-page-button");
+for (const element of homePageBtn) {
+  element.addEventListener("click", () => {
+    showPage("home");
+  });
+}
