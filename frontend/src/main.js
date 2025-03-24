@@ -24,7 +24,9 @@ const apiCall = (path, body, mtd) => {
     .then((response) => response.json())
     .then((data) => {
       if (data.error) {
+        // console.log("err");
         errorPopup(data.error);
+        // return Promise.reject(new Error(data.error));
       } else {
         return Promise.resolve(data);
         // or handle the data here
@@ -555,11 +557,14 @@ document.getElementById("login-link").addEventListener("click", () => {
 document.getElementById("signup-link").addEventListener("click", () => {
   showPage("registration");
 });
-const logoutBtn = document.getElementById("logout-btn");
-logoutBtn.addEventListener("click", () => {
-  localStorage.clear();
-  showPage("login");
-});
+const logoutBtn = document.getElementsByClassName("logout-btn");
+for (const element of logoutBtn) {
+  element.addEventListener("click", () => {
+    localStorage.clear();
+    showPage("login");
+
+  });
+};
 const homePageBtn = document.getElementsByClassName("home-page-button");
 for (const element of homePageBtn) {
   element.addEventListener("click", () => {
