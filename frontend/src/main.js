@@ -570,3 +570,19 @@ for (const element of homePageBtn) {
     showPage("home");
   });
 }
+const getCurrentUserName = async () => {
+  const userResponse = await apiCall(`user?userId=${localStorage.getItem("userId")}`,{},"GET");
+  return userResponse.name;
+}
+
+const loggedInAs = document.getElementsByClassName("current-user-name");
+for (const element of loggedInAs) {
+  element.classList.add("me-2");
+  element.style.cursor = "pointer";
+  element.innerText = `Logged In As: ${await getCurrentUserName()}`;
+  element.addEventListener("click", async ()=> {
+    const userResponse = await apiCall(`user?userId=${localStorage.getItem("userId")}`,{},"GET");
+    constructProfilePage(userResponse)
+    showPage("profile");
+  })
+}
