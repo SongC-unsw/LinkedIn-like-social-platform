@@ -653,3 +653,27 @@ fileInput.addEventListener('change', (event) => {
     imageBase64 = undefined;
   }
 });
+const saveChanges = document.getElementById("save-profile");
+saveChanges.addEventListener("click", async (event)=>{
+  event.preventDefault();
+  saveChanges.innerText = "Saving..."
+  saveChanges.disable = true;
+  const userCurrentDetail = await getCurrentUserDetail();
+  const body = {
+    email: userCurrentDetail.email !== editEmail.value ? editEmail.value : undefined,
+    password: userCurrentDetail.password !== editPassword.value ? editPassword.value : undefined,
+    name: userCurrentDetail.name !== editName.value ? editName.value : undefined,
+    image: userCurrentDetail.image !== imageBase64 ? imageBase64 : undefined
+  }
+  await apiCall("user",body,"PUT");
+  saveChanges.classList.remove("btn-primary");
+  saveChanges.innerText = "Saved!";
+  saveChanges.classList.add("btn-success");
+  // Reset button state after a short delay
+  setTimeout(() => {
+    saveChanges.innerText = "Save Changes";
+    saveChanges.classList.remove("btn-success");
+    saveChanges.classList.add("btn-primary");
+    saveChanges.disabled = false;
+  }, 800);
+})
