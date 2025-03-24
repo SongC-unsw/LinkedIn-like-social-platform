@@ -422,7 +422,6 @@ const constructProfilePage = async (userResponse) => {
   const emailDetail = document.querySelector(".profile-email-value");
   const watchCount = document.querySelector(".profile-watch-count");
   const followedBy = document.querySelector(".followed-by-name");
-  const jobPostedContainer = document.querySelector(".job-posted-container");
   const userWhoWatchMeIds = userResponse.usersWhoWatchMeUserIds;
   let followedByName = [];
   for (const id of userWhoWatchMeIds) {
@@ -457,9 +456,8 @@ const constructProfilePage = async (userResponse) => {
   
   // follow button logic
   const followBtnContainer = document.querySelector(".profile-follow-btn-container");
+  followBtnContainer.innerHTML = "";
   if (followBtnContainer) {
-    followBtnContainer.innerHTML = "";
-    
     const currentUserId = parseInt(localStorage.getItem("userId"));
     const currentUserObj = await apiCall(`user?userId=${currentUserId}`);
     const currentUserName = currentUserObj.name;
@@ -495,6 +493,14 @@ const constructProfilePage = async (userResponse) => {
       });
       
       followBtnContainer.appendChild(followBtn);
+    } else {
+      const updateProfileBtn = document.createElement("button");
+      updateProfileBtn.className = "update-profile-btn btn btn-outline-dark";
+      updateProfileBtn.innerText = "📝 Edit your profile";
+      updateProfileBtn.addEventListener("click", () => {
+        showPage("profile-edit");
+      })
+      followBtnContainer.appendChild(updateProfileBtn);
     }
   }
   // job-posting made by this person
