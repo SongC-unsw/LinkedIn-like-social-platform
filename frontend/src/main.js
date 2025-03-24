@@ -471,7 +471,7 @@ const constructProfilePage = async (userResponse) => {
         } else {
           followedByName = followedByName.filter(name => name !== currentUserName)
         }
-        followedBy.innerText = followedByName;
+        followedBy.innerText = followedByName.join(", ");
       });
       
       followBtnContainer.appendChild(followBtn);
