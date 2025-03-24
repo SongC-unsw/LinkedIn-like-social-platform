@@ -505,8 +505,6 @@ const constructProfilePage = async (userResponse) => {
   }
   // job-posting made by this person
   loadJob(userResponse);
-
-  
   console.log(userResponse);
 }
 
@@ -599,19 +597,59 @@ for (const element of homePageBtn) {
     showPage("home");
   });
 }
-const getCurrentUserName = async () => {
+const getCurrentUserDetail = async () => {
   const userResponse = await apiCall(`user?userId=${localStorage.getItem("userId")}`,{},"GET");
-  return userResponse.name;
+  return userResponse;
 }
+const updateUserDisplay = async () => {
+  const loggedInAs = document.getElementsByClassName("current-user-name");
+  for (const element of loggedInAs) {
+    element.classList.add("me-2");
+    element.style.cursor = "pointer";
+    const userResponse = await getCurrentUserDetail();
+    element.innerText = `Logged In As: ${userResponse.name}`;
+    element.addEventListener("click", async ()=> {
+      const userResponse = await apiCall(`user?userId=${localStorage.getItem("userId")}`,{},"GET");
+      constructProfilePage(userResponse)
+      showPage("profile");
+    })
+  }
+}
+updateUserDisplay();
+// edit profile logic
+const editEmail = document.getElementById("edit-email");
+const editName = document.getElementById("edit-name");
+const editPassword = document.getElementById("edit-password");
+const updateUserValue = async () => {
+  const editAvatar = document.querySelector(".avatar-profile-edit");
+  const userDetail = await getCurrentUserDetail();
+  editAvatar.src = userDetail.image;
+  editEmail.value = userDetail.email;
+  editName.value = userDetail.name;
+  editPassword.value = userDetail.password;
+}
+updateUserValue();
+const fileInput = document.getElementById("profile-image-upload");
+const fileSelectedText = document.getElementById('file-selected');
+let imageBase64 = undefined;
 
-const loggedInAs = document.getElementsByClassName("current-user-name");
-for (const element of loggedInAs) {
-  element.classList.add("me-2");
-  element.style.cursor = "pointer";
-  element.innerText = `Logged In As: ${await getCurrentUserName()}`;
-  element.addEventListener("click", async ()=> {
-    const userResponse = await apiCall(`user?userId=${localStorage.getItem("userId")}`,{},"GET");
-    constructProfilePage(userResponse)
-    showPage("profile");
-  })
-}
+fileInput.addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    fileSelectedText.textContent = `Selected: ${file.name}`;
+    // Convert the file to base64
+    fileToDataUrl(file)
+      .then((base64Data) => {
+        imageBase64 = base64Data;
+        document.querySelector(".avatar-profile-edit").src = imageBase64;
+        console.log("Image converted to base64");
+      })
+      .catch((error) => {
+        console.error("Error converting image:", error);
+        errorPopup("Failed to process the image");
+      });
+  } else {
+    fileSelectedText.textContent = 'No file selected';
+    imageBase64 = undefined;
+  }
+});
