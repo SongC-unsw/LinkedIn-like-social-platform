@@ -205,7 +205,11 @@
                   <img class="avatar-profile-edit rounded-circle me-3" src="" alt="profile picture" />
                   <div>
                     <h5 class="mb-1">Profile Picture</h5>
-                    <button class="btn btn-sm btn-outline-secondary">⬆️ Upload A New Image</button>
+                    <div class="d-flex align-items-center">
+                      <input type="file" id="profile-image-upload" class="d-none" accept="image/*">
+                      <label for="profile-image-upload" class="btn btn-sm btn-outline-secondary mb-0">⬆️ Upload A New Profile Pic</label>
+                      <span id="file-selected" class="ms-2 text-muted small"></span>
+                    </div>
                   </div>
                 </div>
                 <div class="profile-detail">
