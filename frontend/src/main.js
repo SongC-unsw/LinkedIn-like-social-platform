@@ -669,7 +669,7 @@ saveChanges.addEventListener("click", async (event)=>{
   saveChanges.classList.remove("btn-primary");
   saveChanges.innerText = "Saved!";
   saveChanges.classList.add("btn-success");
-  // Reset button state after a short delay
+  // Reset button state
   setTimeout(() => {
     saveChanges.innerText = "Save Changes";
     saveChanges.classList.remove("btn-success");
@@ -677,3 +677,4 @@ saveChanges.addEventListener("click", async (event)=>{
     saveChanges.disabled = false;
   }, 800);
 })
+// TODO Publish job posting
