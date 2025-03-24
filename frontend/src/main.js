@@ -206,7 +206,27 @@ const creatPost = async (post, feed) => {
   const currentUserObj = await apiCall(`user?userId=${localStorage.getItem("userId")}`, {}, "GET");
   const currentUserName = currentUserObj.name;
   const creatorName = response.name;
-
+  // delete button and edit button
+  const buttonDiv = document.createElement("div");
+  const deletePostBtn = document.createElement("button");
+  const editPostBtn = document.createElement("button");
+  buttonDiv.append(editPostBtn, deletePostBtn);
+  buttonDiv.classList.add("ms-auto");
+  deletePostBtn.className = "btn btn-light d-none";
+  editPostBtn.className = "btn btn-light d-none";
+  editPostBtn.innerText = "✏️ Edit Post";
+  deletePostBtn.innerText = "🗑️ Delete";
+  if (post.creatorId === parseInt(localStorage.getItem("userId"))) {
+    editPostBtn.classList.remove("d-none");
+    deletePostBtn.classList.remove("d-none");
+  }
+  deletePostBtn.addEventListener("click", () => {
+    apiCall("job", { id: post.id }, "DELETE")
+    .then(() => {
+      feedPost.remove();
+    });
+  });
+  
   // profile pic
   const profilePic = document.createElement("div");
   profilePic.className = "profile-picture rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center";
@@ -281,6 +301,7 @@ const creatPost = async (post, feed) => {
   postHeader.appendChild(nameElement);
   postHeader.appendChild(timeElement);
   topSection.appendChild(postHeader);
+  topSection.appendChild(buttonDiv);
   feedPost.appendChild(topSection);
 
   // create post main content
