@@ -38,28 +38,56 @@ const loadFeed = async (feed) => {
   document.querySelector(feed).innerHTML = "";
   response.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const currentDate = new Date();
-  const postPromise = response
-  .filter(post => new Date(post.start) >= currentDate)
-  .map(post => createPost(post, feed));
+  
+  // create a list for elements
+  const postsElements = [];
 
-  await Promise.all(postPromise);
+  await Promise.all(
+    response
+      .filter(post => new Date(post.start) >= currentDate)
+      .map(async (post) => {
+        const postElement = await createPost(post);
+        postsElements.push({ id: post.id, element: postElement });
+      })
+  );
+  
+
+  const feedContainer = document.querySelector(feed);
+  for (const postObj of postsElements) {
+    feedContainer.appendChild(postObj.element);
+  }
 
 };
 const loadJob = async (userResponse) => {
-  document.querySelector(".job-posted-container").innerHTML = "";
+  const container = document.querySelector(".job-posted-container");
+  container.innerHTML = "";
+  
   if (!userResponse.jobs || userResponse.jobs.length === 0) {
     const noJobsMessage = document.createElement("div");
     noJobsMessage.className = "alert alert-info text-center";
     noJobsMessage.innerText = "No jobs posted yet";
-    document.querySelector(".job-posted-container").appendChild(noJobsMessage);
+    container.appendChild(noJobsMessage);
     return;
   }
+
   const jobs = userResponse.jobs;
-  const currentDate = new Date();
   jobs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  const jobPromises = jobs.filter(post => new Date(post.start) >= currentDate).map(post => createPost(post, ".job-posted-container"));
-  await Promise.all(jobPromises);
-}
+  const currentDate = new Date();
+  
+  const jobElements = [];
+  await Promise.all(
+    jobs
+      .filter(post => new Date(post.start) >= currentDate)
+      .map(async (post) => {
+        const postElement = await createPost(post);
+        jobElements.push({ id: post.id, element: postElement });
+      })
+  );
+  
+  for (const jobObj of jobElements) {
+    container.appendChild(jobObj.element);
+  }
+};
 const updateLikeBtn = (likeBtn, haveLiked) => {
   if (haveLiked) {
     likeBtn.classList.remove("btn-primary");
@@ -174,7 +202,7 @@ const handlePostComment = (commentSubmit, commentInput, currentUserName, comment
 
 };
 
-const createPost = async (post, feed) => {
+const createPost = async (post) => {
   // async function to deal with apicall
   // post here is a response object
   console.log(post);
@@ -476,8 +504,7 @@ const createPost = async (post, feed) => {
   feedPost.appendChild(commAndLikes);
   feedPost.appendChild(likeBy);
   feedPost.appendChild(comSection);
-  document.querySelector(feed).appendChild(feedPost);
-  return Promise.resolve();
+  return feedPost;
 };
 
 // profile page logic
