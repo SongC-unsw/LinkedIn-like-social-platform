@@ -33,26 +33,19 @@ const apiCall = (path, body, mtd) => {
 };
 
 // feed logic
-const loadFeed = (feed) => {
-  // after login or signup, token set
-  apiCall("job/feed/?start=0", {}, "GET").then((response) => {
-    console.log("we are testing")
-    console.log(response);
-    document.querySelector(feed).innerHTML = "";
-    // post
-    response.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    for (const post of response) {
-      // make sure to only show jobs start date later than today
-      // Sort posts by creation date, newest first
-      const startDate = new Date(post.start);
-      const currentDate = new Date();
-      if (startDate >= currentDate) {
-        creatPost(post, feed);
-      }
-    }
-  });
+const loadFeed = async (feed) => {
+  const response = await apiCall("job/feed/?start=0",{},"GET");
+  document.querySelector(feed).innerHTML = "";
+  response.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const currentDate = new Date();
+  const postPromise = response
+  .filter(post => new Date(post.start) >= currentDate)
+  .map(post => createPost(post, feed));
+
+  await Promise.all(postPromise);
+
 };
-const loadJob = (userResponse) => {
+const loadJob = async (userResponse) => {
   document.querySelector(".job-posted-container").innerHTML = "";
   if (!userResponse.jobs || userResponse.jobs.length === 0) {
     const noJobsMessage = document.createElement("div");
@@ -62,14 +55,10 @@ const loadJob = (userResponse) => {
     return;
   }
   const jobs = userResponse.jobs;
+  const currentDate = new Date();
   jobs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  for (const post of jobs) {
-    const startDate = new Date(post.start);
-    const currentDate = new Date();
-    if (startDate >= currentDate) {
-      creatPost(post, ".job-posted-container");
-    }
-  }
+  const jobPromises = jobs.filter(post => new Date(post.start) >= currentDate).map(post => createPost(post, ".job-posted-container"));
+  await Promise.all(jobPromises);
 }
 const updateLikeBtn = (likeBtn, haveLiked) => {
   if (haveLiked) {
@@ -185,7 +174,7 @@ const handlePostComment = (commentSubmit, commentInput, currentUserName, comment
 
 };
 
-const creatPost = async (post, feed) => {
+const createPost = async (post, feed) => {
   // async function to deal with apicall
   // post here is a response object
   console.log(post);
@@ -357,34 +346,34 @@ const creatPost = async (post, feed) => {
   topSection.appendChild(postHeader);
   topSection.appendChild(buttonDiv);
   feedPost.appendChild(topSection);
+  // append element to main content
+  const postContent = document.createElement("div");
+  const postTitle = document.createElement("h4");
+  const jobDetail = document.createElement("p");
+  const descriptionImg = document.createElement("img");
+  const startTime = new Date(post.start);
+  const formattedStartDate = startTime.toLocaleDateString('en-GB'); // DD/MM/YYYY format
+  const startTimeContainer = document.createElement("div");
+  postContent.append(postTitle, startTimeContainer, jobDetail, descriptionImg);
+  feedPost.appendChild(postContent);
 
   // create post main content
-  const postContent = document.createElement("div");
   postContent.className = "post-content";
   postContent.style.width = "100%";
   // create post title
-  const postTitle = document.createElement("h4");
   postTitle.className = "post-title";
   postTitle.innerText = post.title;
   // create job description
-  const jobDetail = document.createElement("p");
   jobDetail.className = "post-job-detail";
   jobDetail.innerText = post.description;
   //create img element
-  const descriptionImg = document.createElement("img");
   descriptionImg.classList.add("img-fluid", "img-thumbnail");
   descriptionImg.style.width = "100%";
   descriptionImg.src = post.image;
 
-  const startTime = new Date(post.start);
-  const formattedStartDate = startTime.toLocaleDateString('en-GB'); // DD/MM/YYYY format
-  const startTimeContainer = document.createElement("div");
   startTimeContainer.classList.add("start-time", "bg-info", "bg-opacity-10", "px-3", "py-2","my-2", "rounded-pill", "text-primary", "fw-bold", "d-inline-block");
   startTimeContainer.innerText = `Start Date: ${formattedStartDate}`;
   console.log(startTime);
-  // append element to main content
-  postContent.append(postTitle, startTimeContainer, jobDetail, descriptionImg);
-  feedPost.appendChild(postContent);
   //comment section and likes
   const commAndLikes = document.createElement("div");
   commAndLikes.classList.add(
@@ -488,6 +477,7 @@ const creatPost = async (post, feed) => {
   feedPost.appendChild(likeBy);
   feedPost.appendChild(comSection);
   document.querySelector(feed).appendChild(feedPost);
+  return Promise.resolve();
 };
 
 // profile page logic
