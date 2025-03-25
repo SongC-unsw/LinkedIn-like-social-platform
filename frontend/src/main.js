@@ -616,6 +616,11 @@ const editPostPopup = () => {
   const modalInstance = new bootstrap.Modal(popup);
   modalInstance.show();
 }
+const createPostPopup = () => {
+  const popup = document.getElementById("new-post-popup");
+  const modalInstance = new bootstrap.Modal(popup);
+  modalInstance.show();
+}
 
 // register logic
 const submitBtn = document.getElementById("submit");
@@ -766,3 +771,37 @@ saveChanges.addEventListener("click", async (event)=>{
   }, 800);
 })
 // TODO Publish job posting
+const createNewJobBtn = document.querySelector(".create-job-post");
+createNewJobBtn.addEventListener("click", () => {
+  createPostPopup();
+  setupNewJobPosting();
+});
+// new job posting logic
+const setupNewJobPosting = () => {
+  const postJobTitleField = document.getElementById("post-job-title");
+  const postJobTextarea = document.getElementById("post-job-text");
+  const postDateElement = document.getElementById("post-dateInput");
+  const jobImageUploadInput = document.getElementById("post-job-image-upload");
+  const jobImageView = document.querySelector(".post-current-image-display");
+  const postJobButton = document.querySelector(".post-job");
+  console.log(postJobButton);
+  
+  // Handle image upload preview
+  jobImageUploadInput.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      fileToDataUrl(file)
+        .then((base64Data) => {
+          jobImageView.src = base64Data;
+          jobImageView.classList.remove("d-none");
+        })
+        .catch((error) => {
+          console.error("Error converting image:", error);
+          errorPopup("Failed to process the image");
+        });
+    }
+  });
+  
+
+};
+
