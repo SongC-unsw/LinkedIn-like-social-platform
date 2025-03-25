@@ -777,6 +777,52 @@ createNewJobBtn.addEventListener("click", () => {
   setupNewJobPosting();
 });
 // new job posting logic
+document.querySelector(".post-job").addEventListener("click", () => {
+  const postJobTitleField = document.getElementById("post-job-title");
+  const postJobTextarea = document.getElementById("post-job-text");
+  const postDateElement = document.getElementById("post-dateInput");
+  const jobImageView = document.querySelector(".post-current-image-display");
+  
+  const title = postJobTitleField.value;
+  const description = postJobTextarea.value;
+  const startDate = new Date(postDateElement.value);
+  const image = jobImageView.src;
+  
+  // Validate inputs
+  if (!title || !description || !startDate || isNaN(startDate)) {
+    errorPopup("Please fill in all required fields");
+    return;
+  }
+  
+  // Create new job posting
+  apiCall("job", {
+    title: title,
+    description: description,
+    start: startDate,
+    image: image ? image : undefined
+  }, "POST").then(() => {
+    this.classList.remove("btn-primary");
+    this.classList.add("btn-success");
+    this.innerText = "Posted!";
+    
+    // Reset form and close modal
+    setTimeout(() => {
+      this.classList.remove("btn-success");
+      this.classList.add("btn-primary");
+      this.innerText = "Post";
+      
+      postJobTitleField.value = '';
+      postJobTextarea.value = '';
+      postDateElement.value = '';
+      jobImageView.src = "";
+      jobImageView.classList.add("d-none");
+      
+      const popup = document.getElementById("new-post-popup");
+      const modalInstance = bootstrap.Modal.getInstance(popup);
+      modalInstance.hide();
+    }, 800);
+  });
+});
 const setupNewJobPosting = () => {
   const jobImageUploadInput = document.getElementById("post-job-image-upload");
   const jobImageView = document.querySelector(".post-current-image-display");
