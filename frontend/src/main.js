@@ -466,12 +466,10 @@ const createPost = async (post) => {
   }
   
   if (post.comments.length > 0) {
-    (async () => {    
-      for (const comment of post.comments) {
-        const commentElement = await createComment(comment);
-        commentsList.appendChild(commentElement);
-      }
-    })();
+    await Promise.all(post.comments.map(async (comment) => {
+      const commentElement = await createComment(comment);
+      commentsList.appendChild(commentElement);
+    }));
   }
   
   comSection.appendChild(commentsList);
