@@ -712,7 +712,7 @@ const updateUserValue = async () => {
   editAvatar.src = userDetail.image;
   editEmail.value = userDetail.email;
   editName.value = userDetail.name;
-  editPassword.value = userDetail.password;
+  editPassword.value = '';
 }
 if (localStorage.getItem("token")) {
   updateUserDisplay();
@@ -749,7 +749,7 @@ saveChanges.addEventListener("click", async (event)=>{
   const userCurrentDetail = await getCurrentUserDetail();
   const body = {
     email: userCurrentDetail.email !== editEmail.value ? editEmail.value : undefined,
-    password: userCurrentDetail.password !== editPassword.value ? editPassword.value : undefined,
+    password: editPassword.value ? editPassword.value : undefined,
     name: userCurrentDetail.name !== editName.value ? editName.value : undefined,
     image: userCurrentDetail.image !== imageBase64 ? imageBase64 : undefined
   }
