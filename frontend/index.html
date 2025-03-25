@@ -40,7 +40,7 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body py-0">
-              <form action="">
+              <form>
                 <div class="mb-3">
                   <label for="edit-job-title" class="col-form-label">Job title:</label>
                   <input type="text" class="form-control fw-bold" id="job-title">
@@ -57,10 +57,13 @@
                   <label for="job-image-upload" class="col-form-label">Upload new image:</label>
                     <input type="file" id="job-image-upload" class="form-control" accept="image/*">
                 </div>
-                <div id="current-image" class="border border-1">
-                  <img src="" alt="" class="current-image-display w-100">
+                <div id="current-image">
+                    <img src="" alt="job-image" class="current-image-display mb-5 w-50 mx-auto d-block border border-1">
                 </div>
               </form>
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-primary save-job-edit mb-3">Save Changes</button>
+              </div>
             </div>
           </div>
         </div>
