@@ -569,13 +569,15 @@ const constructProfilePage = async (userResponse) => {
       
       followBtnContainer.appendChild(followBtn);
     } else {
+      followBtnContainer.innerHTML = "";
       const updateProfileBtn = document.createElement("button");
+      followBtnContainer.appendChild(updateProfileBtn);
       updateProfileBtn.className = "update-profile-btn btn btn-outline-dark";
       updateProfileBtn.innerText = "📝 Edit your profile";
       updateProfileBtn.addEventListener("click", () => {
+        updateUserValue();
         showPage("profile-edit");
       })
-      followBtnContainer.appendChild(updateProfileBtn);
     }
   }
   // job-posting made by this person
@@ -635,6 +637,7 @@ submitBtn.addEventListener("click", () => {
       localStorage.setItem("userId", data.userId);
       showPage("home");
       loadFeed(".feed");
+      updateUserDisplay();
     });
   }
 });
@@ -654,6 +657,7 @@ loginBtn.addEventListener("click", (event) => {
     localStorage.setItem("userId", response.userId);
     showPage("home");
     loadFeed(".feed");
+    updateUserDisplay();
   });
 });
 
@@ -682,6 +686,7 @@ const getCurrentUserDetail = async () => {
   const userResponse = await apiCall(`user?userId=${localStorage.getItem("userId")}`,{},"GET");
   return userResponse;
 }
+
 const updateUserDisplay = async () => {
   const loggedInAs = document.getElementsByClassName("current-user-name");
   for (const element of loggedInAs) {
@@ -696,7 +701,7 @@ const updateUserDisplay = async () => {
     })
   }
 }
-updateUserDisplay();
+
 // edit profile logic
 const editEmail = document.getElementById("edit-email");
 const editName = document.getElementById("edit-name");
@@ -709,7 +714,9 @@ const updateUserValue = async () => {
   editName.value = userDetail.name;
   editPassword.value = userDetail.password;
 }
-updateUserValue();
+if (localStorage.getItem("token")) {
+  updateUserDisplay();
+}
 const fileInput = document.getElementById("profile-image-upload");
 const fileSelectedText = document.getElementById('file-selected');
 let imageBase64 = undefined;

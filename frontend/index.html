@@ -19,6 +19,7 @@
     <main role="main">
       <!--2.1. Milestone 1 - Registration & Login -->
       <!-- app goes here -->
+      <!-- Modal boilerplate copied from boostrap docs:https://getbootstrap.com/docs/5.3/components/modal/#modal-components, modified according to requirements-->
       <div class="modal fade" tabindex="-1" role="dialog" id="popup">
         <div class="modal-dialog" role="document">
           <div class="modal-content rounded-4 shadow">
@@ -181,7 +182,17 @@
             </div>
           </div>
         </div>
+        <nav aria-label="Page navigation" class="w-100 mx-auto">
+          <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+          </ul>
+        </nav>
       </div>
+
       <div class="profile page bg-light hide">
         <nav class="navbar bg-white shadow-sm mb-3">
           <div class="container-fluid">
