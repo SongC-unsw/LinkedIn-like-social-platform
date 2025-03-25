@@ -801,7 +801,47 @@ const setupNewJobPosting = () => {
         });
     }
   });
-  
-
+  // Handle job creation
+  postJobButton.addEventListener("click", () => {
+    const title = postJobTitleField.value;
+    const description = postJobTextarea.value;
+    const startDate = new Date(postDateElement.value);
+    const image = jobImageView.src;
+    
+    // Validate inputs
+    if (!title || !description || !startDate || isNaN(startDate)) {
+      errorPopup("Please fill in all required fields");
+      return;
+    }
+    
+    // Create new job posting
+    apiCall("job", {
+      title: title,
+      description: description,
+      start: startDate,
+      image: image ? image : undefined
+    }, "POST").then(() => {
+      postJobButton.classList.remove("btn-primary");
+      postJobButton.classList.add("btn-success");
+      postJobButton.innerText = "Posted!";
+      
+      // Reset form and close modal
+      setTimeout(() => {
+        postJobButton.classList.remove("btn-success");
+        postJobButton.classList.add("btn-primary");
+        postJobButton.innerText = "Post";
+        
+        postJobTitleField.value = '';
+        postJobTextarea.value = '';
+        postDateElement.value = '';
+        jobImageView.src = "";
+        jobImageView.classList.add("d-none");
+        
+        const popup = document.getElementById("new-post-popup");
+        const modalInstance = bootstrap.Modal.getInstance(popup);
+        modalInstance.hide();
+      }, 800);
+    });
+  });
 };
 
