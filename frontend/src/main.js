@@ -801,7 +801,7 @@ document.querySelector(".post-job").addEventListener("click", function() {
   const title = postJobTitleField.value;
   const description = postJobTextarea.value;
   const startDate = new Date(postDateElement.value);
-  const image = jobImageView.src;
+  const image = jobImageView.classList.contains("d-none") ? null : jobImageView.src;
   
   // Validate inputs
   if (!title || !description || !startDate || isNaN(startDate)) {
@@ -812,9 +812,9 @@ document.querySelector(".post-job").addEventListener("click", function() {
   // Create new job posting
   apiCall("job", {
     title: title,
-    description: description,
+    image: image ? image : "",
     start: startDate,
-    image: image ? image : undefined
+    description: description,
   }, "POST").then(() => {
     this.classList.remove("btn-primary");
     this.classList.add("btn-success");
