@@ -44,7 +44,7 @@
               <form>
                 <div class="mb-3">
                   <label for="edit-job-title" class="col-form-label">Job title:</label>
-                  <input type="text" class="form-control fw-bold" id="job-title">
+                  <input type="text" class="form-control fw-bold" id="job-title" />
                 </div>
                 <div class="mb-3">
                   <label for="job-description-text" class="col-form-label">Job description:</label>
@@ -52,18 +52,54 @@
                 </div>
                 <div class="mb-3">
                   <label for="dateInput" class="form-label">Change start date:</label>
-                  <input type="date" class="form-control" id="dateInput">
+                  <input type="date" class="form-control" id="dateInput" />
                 </div>
                 <div class="mb-3">
                   <label for="job-image-upload" class="col-form-label">Upload new image:</label>
-                    <input type="file" id="job-image-upload" class="form-control" accept="image/*">
+                  <input type="file" id="job-image-upload" class="form-control" accept="image/*" />
                 </div>
                 <div id="current-image">
-                    <img src="" alt="job-image" class="current-image-display mb-5 w-50 mx-auto d-block border border-1">
+                  <img src="" alt="job-image" class="current-image-display mb-5 w-50 mx-auto d-block border border-1" />
                 </div>
               </form>
               <div class="d-flex justify-content-end">
                 <button class="btn btn-primary save-job-edit mb-3">Save Changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal modal-lg fade" tabindex="-1" role="dialog" id="new-post-popup">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content rounded-4 shadow">
+            <div class="modal-header border-bottom-0">
+              <h1 class="modal-title fs-5">New Post</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-0">
+              <form>
+                <div class="mb-3">
+                  <label for="edit-job-title" class="col-form-label">Job title:</label>
+                  <input type="text" class="form-control fw-bold" id="job-title" />
+                </div>
+                <div class="mb-3">
+                  <label for="job-description-text" class="col-form-label">Job description:</label>
+                  <textarea class="form-control" id="job-text" rows="9"></textarea>
+                </div>
+                <div class="mb-3">
+                  <label for="dateInput" class="form-label">Pick start date:</label>
+                  <input type="date" class="form-control" id="dateInput" />
+                </div>
+                <div class="mb-3">
+                  <label for="job-image-upload" class="col-form-label">Upload image:</label>
+                  <input type="file" id="job-image-upload" class="form-control" accept="image/*" />
+                </div>
+                <div id="current-image">
+                  <img src="" alt="job-image" class="current-image-display mb-5 w-50 mx-auto d-block border border-1" />
+                </div>
+              </form>
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-primary save-job-edit mb-3">Post</button>
               </div>
             </div>
           </div>
@@ -170,6 +206,7 @@
               <a href="#" class="home-page-button">Home Page</a>
             </div>
             <div class="right-side">
+              <button class="btn btn-primary me-3 create-job-post">✍️ Create a Job Posting</button>
               <span class="current-user-name"></span>
               <button class="btn btn-outline-primary logout-btn">Log out</button>
             </div>
@@ -253,8 +290,9 @@
                   <div>
                     <h5 class="mb-1">Profile Picture</h5>
                     <div class="d-flex align-items-center">
-                      <input type="file" id="profile-image-upload" class="d-none" accept="image/*">
-                      <label for="profile-image-upload" class="btn btn-sm btn-outline-secondary mb-0">⬆️ Upload A New Profile Pic</label>
+                      <input type="file" id="profile-image-upload" class="d-none" accept="image/*" />
+                      <label for="profile-image-upload" class="btn btn-sm btn-outline-secondary mb-0"
+                        >⬆️ Upload A New Profile Pic</label>
                       <span id="file-selected" class="ms-2 text-muted small"></span>
                     </div>
                   </div>
