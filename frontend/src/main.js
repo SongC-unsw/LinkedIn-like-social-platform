@@ -226,7 +226,10 @@ const creatPost = async (post, feed) => {
       feedPost.remove();
     });
   });
-  
+
+  editPostBtn.addEventListener("click", () => {
+    editPostPopup();
+  })
   // profile pic
   const profilePic = document.createElement("div");
   profilePic.className = "profile-picture rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center";
@@ -554,6 +557,12 @@ const errorPopup = (msg) => {
   const modalInstance = new bootstrap.Modal(popup);
   modalInstance.show();
 };
+
+const editPostPopup = () => {
+  const popup = document.getElementById("edit-post-popup");
+  const modalInstance = new bootstrap.Modal(popup);
+  modalInstance.show();
+}
 
 // register logic
 const submitBtn = document.getElementById("submit");

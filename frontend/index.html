@@ -32,6 +32,39 @@
           </div>
         </div>
       </div>
+      <div class="modal modal-lg fade" tabindex="-1" role="dialog" id="edit-post-popup">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content rounded-4 shadow">
+            <div class="modal-header border-bottom-0">
+              <h1 class="modal-title fs-5">Edit Post</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-0">
+              <form action="">
+                <div class="mb-3">
+                  <label for="edit-job-title" class="col-form-label">Job title:</label>
+                  <input type="text" class="form-control fw-bold" id="job-title">
+                </div>
+                <div class="mb-3">
+                  <label for="job-description-text" class="col-form-label">Job description:</label>
+                  <textarea class="form-control" id="job-text" rows="9"></textarea>
+                </div>
+                <div class="mb-3">
+                  <label for="dateInput" class="form-label">Change start date:</label>
+                  <input type="date" class="form-control" id="dateInput">
+                </div>
+                <div class="mb-3">
+                  <label for="job-image-upload" class="col-form-label">Upload new image:</label>
+                    <input type="file" id="job-image-upload" class="form-control" accept="image/*">
+                </div>
+                <div id="current-image" class="border border-1">
+                  <img src="" alt="" class="current-image-display w-100">
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="login page hide">
         <div class="container">
