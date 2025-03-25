@@ -777,7 +777,7 @@ createNewJobBtn.addEventListener("click", () => {
   setupNewJobPosting();
 });
 // new job posting logic
-document.querySelector(".post-job").addEventListener("click", () => {
+document.querySelector(".post-job").addEventListener("click", function() {
   const postJobTitleField = document.getElementById("post-job-title");
   const postJobTextarea = document.getElementById("post-job-text");
   const postDateElement = document.getElementById("post-dateInput");
