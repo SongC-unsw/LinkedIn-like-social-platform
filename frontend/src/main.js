@@ -228,8 +228,58 @@ const creatPost = async (post, feed) => {
   });
 
   editPostBtn.addEventListener("click", () => {
+    const jobTitleEdit = document.getElementById("job-title");
+    jobTitleEdit.value = post.title;
+    const jobDescriptionEdit = document.getElementById("job-text");
+    jobDescriptionEdit.textContent = post.description;
+    const startDatePicker = document.getElementById("dateInput");
+    // Format the date for the date input (YYYY-MM-DD)
+    const formattedDate = new Date(post.start).toLocaleDateString('en-CA', { timeZone: 'Australia/Sydney' });
+    startDatePicker.value = formattedDate;
+    const currentImgDisplay = document.querySelector(".current-image-display");
+    currentImgDisplay.src = post.image;
     editPostPopup();
-  })
+  });
+
+  const currentImgInput = document.getElementById("job-image-upload");
+  const currentImgDisplay = document.querySelector(".current-image-display");
+  currentImgInput.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      fileToDataUrl(file)
+        .then((base64Data) => {
+          currentImgDisplay.src = base64Data;
+        })
+        .catch((error) => {
+          console.error("Error converting image:", error);
+          errorPopup("Failed to process the image");
+        });
+    }
+  });
+  const editPostSave = document.querySelector(".save-job-edit");
+  editPostSave.addEventListener("click", ()=> {
+    const updatedTitle = document.getElementById("job-title").value;
+    const updatedDescription = document.getElementById("job-text").value;
+    const updatedStartDate = new Date(document.getElementById("dateInput").value);
+    const updatedImage = currentImgDisplay.src;
+
+    apiCall("job", {
+      id: post.id,
+      title: updatedTitle,
+      description: updatedDescription,
+      start: updatedStartDate,
+      image: updatedImage
+    }, "PUT").then(() => {
+      editPostSave.classList.remove("btn-primary");
+      editPostSave.classList.add("btn-success");
+      editPostSave.innerText = "Saved!";
+      setTimeout(() => {
+        editPostSave.classList.remove("btn-success");
+        editPostSave.classList.add("btn-primary");
+        editPostSave.innerText = "Save Changes";
+      }, 800);
+    });
+  });
   // profile pic
   const profilePic = document.createElement("div");
   profilePic.className = "profile-picture rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center";
