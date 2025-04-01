@@ -42,27 +42,38 @@ const loadFeed = async (feed, startAt) => {
   const response = await apiCall(`job/feed/?start=${startAt}`,{},"GET");
 
   document.querySelector(feed).innerHTML = "";
-
-  response.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  const currentDate = new Date();
   
-  // create a list for elements
-  const postsElements = [];
-
-  await Promise.all(
-    response
-      .filter(post => new Date(post.start) >= currentDate)
-      .map(async (post) => {
-        const postElement = await createPost(post);
-        postsElements.push({ id: post.id, element: postElement });
-      })
-  );
+  response.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const feedContainer = document.querySelector(feed);
-  for (let i = 0; i < 5; i++) {
-    feedContainer.appendChild(postsElements[i].element);
-  };
+  for (const post of response) {
+    const postElement = await createPost(post);
+    feedContainer.appendChild(postElement);
+  }; 
+  setupPagination(feed, startAt);
 };
+const setupPagination = (feed, currentStartAt) => {
+  const nextBtn = document.querySelector(".page-next");
+  const prevBtn = document.querySelector(".page-prev");
 
+  nextBtn.replaceWith(nextBtn.cloneNode(true));
+  prevBtn.replaceWith(prevBtn.cloneNode(true));
+  
+  const newNextBtn = document.querySelector(".page-next");
+  const newPrevBtn = document.querySelector(".page-prev");
+  
+  newNextBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    loadFeed(feed, currentStartAt + 1);
+  });
+  
+  newPrevBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (currentStartAt > 0) {
+      loadFeed(feed, currentStartAt - 1);
+    }
+  });
+  newPrevBtn.disabled = currentStartAt <= 0;
+};
 
 const loadJob = async (userResponse) => {
   const container = document.querySelector(".job-posted-container");
