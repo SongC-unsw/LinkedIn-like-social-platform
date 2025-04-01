@@ -72,7 +72,11 @@ const setupPagination = (feed, currentStartAt) => {
       loadFeed(feed, currentStartAt - 1);
     }
   });
-  newPrevBtn.disabled = currentStartAt <= 0;
+  if (currentStartAt <= 0) {
+    document.querySelector(".page-item-prev").classList.add("disabled");
+  } else {
+    document.querySelector(".page-item-prev").classList.remove("disabled");
+  }
 };
 
 const loadJob = async (userResponse) => {
