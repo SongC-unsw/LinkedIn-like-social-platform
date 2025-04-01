@@ -3,11 +3,15 @@ import { BACKEND_PORT } from "./config.js";
 import { fileToDataUrl } from "./helpers.js";
 
 const showPage = (chosenPage) => {
+  document.querySelector(".pag").classList.add("d-none");
   const pages = document.querySelectorAll(".page");
   for (const page of pages) {
     page.classList.add("hide");
   }
   document.querySelector(`.${chosenPage}.page`).classList.remove("hide");
+  if (chosenPage === "home") {
+    document.querySelector(".pag").classList.remove("d-none");
+  };
 };
 
 const apiCall = (path, body, mtd) => {
@@ -33,9 +37,12 @@ const apiCall = (path, body, mtd) => {
 };
 
 // feed logic
-const loadFeed = async (feed) => {
-  const response = await apiCall("job/feed/?start=0",{},"GET");
+const loadFeed = async (feed, startAt) => {
+  console.log("heloo");
+  const response = await apiCall(`job/feed/?start=${startAt}`,{},"GET");
+
   document.querySelector(feed).innerHTML = "";
+
   response.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const currentDate = new Date();
   
@@ -50,14 +57,13 @@ const loadFeed = async (feed) => {
         postsElements.push({ id: post.id, element: postElement });
       })
   );
-  
-
   const feedContainer = document.querySelector(feed);
-  for (const postObj of postsElements) {
-    feedContainer.appendChild(postObj.element);
-  }
-
+  for (let i = 0; i < 5; i++) {
+    feedContainer.appendChild(postsElements[i].element);
+  };
 };
+
+
 const loadJob = async (userResponse) => {
   const container = document.querySelector(".job-posted-container");
   container.innerHTML = "";
@@ -88,6 +94,7 @@ const loadJob = async (userResponse) => {
     container.appendChild(jobObj.element);
   }
 };
+
 const updateLikeBtn = (likeBtn, haveLiked) => {
   if (haveLiked) {
     likeBtn.classList.remove("btn-primary");
@@ -614,7 +621,7 @@ const updateFollowBtn = (btn, isFollowing) => {
 
 if (localStorage.getItem("token")) {
   showPage("home");
-  loadFeed(".feed");
+  loadFeed(".feed",0);
 } else {
   showPage("login");
 }
@@ -656,7 +663,7 @@ submitBtn.addEventListener("click", () => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.userId);
       showPage("home");
-      loadFeed(".feed");
+      loadFeed(".feed",0);
       updateUserDisplay();
     });
   }
@@ -676,7 +683,7 @@ loginBtn.addEventListener("click", (event) => {
     localStorage.setItem("token", response.token);
     localStorage.setItem("userId", response.userId);
     showPage("home");
-    loadFeed(".feed");
+    loadFeed(".feed",0);
     updateUserDisplay();
   });
 });
