@@ -63,7 +63,7 @@ const setupInfScroll = (feed) => {
     const scrollPosition = window.scrollY + window.innerHeight;
     const pageHeight = document.documentElement.scrollHeight;
 
-    if (pageHeight - scrollPosition < 50) {
+    if (pageHeight - scrollPosition < 30) {
       window.isLoading = true;
       const spinner = document.querySelector(".loading");
       if (spinner) spinner.classList.remove("d-none");
