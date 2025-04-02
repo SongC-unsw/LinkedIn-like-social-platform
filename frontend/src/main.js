@@ -93,21 +93,11 @@ const loadJob = async (userResponse) => {
 
   const jobs = userResponse.jobs;
   jobs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  const currentDate = new Date();
-  
-  const jobElements = [];
-  await Promise.all(
-    jobs
-      .filter(post => new Date(post.start) >= currentDate)
-      .map(async (post) => {
-        const postElement = await createPost(post);
-        jobElements.push({ id: post.id, element: postElement });
-      })
-  );
-  
-  for (const jobObj of jobElements) {
-    container.appendChild(jobObj.element);
-  }
+
+  for (const post of jobs) {
+    const postElement = await createPost(post);
+    container.appendChild(postElement);
+  }; 
 };
 
 const updateLikeBtn = (likeBtn, haveLiked) => {
