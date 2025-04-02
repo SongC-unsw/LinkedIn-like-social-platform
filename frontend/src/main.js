@@ -3,15 +3,11 @@ import { BACKEND_PORT } from "./config.js";
 import { fileToDataUrl } from "./helpers.js";
 
 const showPage = (chosenPage) => {
-  document.querySelector(".pag").classList.add("d-none");
   const pages = document.querySelectorAll(".page");
   for (const page of pages) {
     page.classList.add("hide");
   }
   document.querySelector(`.${chosenPage}.page`).classList.remove("hide");
-  if (chosenPage === "home") {
-    document.querySelector(".pag").classList.remove("d-none");
-  };
 };
 
 const apiCall = (path, body, mtd) => {
@@ -38,47 +34,56 @@ const apiCall = (path, body, mtd) => {
 
 // feed logic
 const loadFeed = async (feed, startAt) => {
-  console.log("heloo");
   const response = await apiCall(`job/feed/?start=${startAt}`,{},"GET");
-
-  document.querySelector(feed).innerHTML = "";
-  
+  window.currentIndex = startAt;
+  if (startAt === 0) {
+    document.querySelector(feed).innerHTML = "";
+    setupInfScroll(feed);
+  }
   response.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const feedContainer = document.querySelector(feed);
   for (const post of response) {
     const postElement = await createPost(post);
     feedContainer.appendChild(postElement);
   }; 
-  setupPagination(feed, startAt);
+  // setupPagination(feed, startAt);
+  window.isLoading = false;
+  return response.length;
 };
-const setupPagination = (feed, currentStartAt) => {
-  const nextBtn = document.querySelector(".page-next");
-  const prevBtn = document.querySelector(".page-prev");
 
-  nextBtn.replaceWith(nextBtn.cloneNode(true));
-  prevBtn.replaceWith(prevBtn.cloneNode(true));
-  
-  const newNextBtn = document.querySelector(".page-next");
-  const newPrevBtn = document.querySelector(".page-prev");
-  
-  newNextBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    loadFeed(feed, currentStartAt + 1);
-  });
-  
-  newPrevBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    if (currentStartAt > 0) {
-      loadFeed(feed, currentStartAt - 1);
+const setupInfScroll = (feed) => {
+
+  window.currentIndex = 0;
+  window.isLoading = false;
+  window.noMorePosts = false;
+
+  window.scrollListener = () => {
+    if (window.isLoading || window.noMorePosts) return;
+    
+    const scrollPosition = window.scrollY + window.innerHeight;
+    const pageHeight = document.documentElement.scrollHeight;
+
+    if (pageHeight - scrollPosition < 50) {
+      window.isLoading = true;
+      const spinner = document.querySelector(".loading");
+      if (spinner) spinner.classList.remove("d-none");
+      
+      loadFeed(feed, window.currentIndex + 5)
+        .then((res) => {
+          if (res === 0) {
+            window.noMorePosts = true;
+            if (spinner) spinner.classList.add("d-none");
+          }
+        })
+        .catch(err => {
+          console.error("Error loading:", err);
+          window.isLoading = false;
+          if (spinner) spinner.classList.add("d-none");
+        });
     }
-  });
-  if (currentStartAt <= 0) {
-    document.querySelector(".page-item-prev").classList.add("disabled");
-  } else {
-    document.querySelector(".page-item-prev").classList.remove("disabled");
-  }
-};
-
+  };
+  window.addEventListener("scroll", window.scrollListener);
+}
 const loadJob = async (userResponse) => {
   const container = document.querySelector(".job-posted-container");
   container.innerHTML = "";
