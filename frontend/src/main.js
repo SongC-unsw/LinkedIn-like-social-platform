@@ -42,16 +42,22 @@ const loadFeed = (feed, startAt) => {
         }
         setupInfScroll(feed);
       }
+      
+      // From new to old
       response.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       const feedContainer = document.querySelector(feed);
       
-      const postPromises = response.map(post => 
-        createPost(post).then(postElement => {
-          feedContainer.appendChild(postElement);
-        })
-      );
+      const fragment = document.createDocumentFragment();
       
-      return Promise.all(postPromises).then(() => {
+      return Promise.all(response.map(post => 
+        createPost(post)
+      )).then(postElements => {
+        postElements.forEach(postElement => {
+          fragment.appendChild(postElement);
+        });
+        
+        feedContainer.appendChild(fragment);
+        
         window.isLoading = false;
         return response.length;
       });
@@ -107,13 +113,20 @@ const loadJob = (userResponse) => {
   const jobs = userResponse.jobs;
   jobs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-  const jobPromises = jobs.map(post => 
-    createPost(post).then(postElement => {
-      container.appendChild(postElement);
-    })
-  );
+  const fragment = document.createDocumentFragment();
   
-  return Promise.all(jobPromises);
+
+  return Promise.all(jobs.map(post => 
+    createPost(post)
+  )).then(postElements => {
+
+    postElements.forEach(postElement => {
+      fragment.appendChild(postElement);
+    });
+    container.appendChild(fragment);
+    
+    return postElements.length;
+  });
 }; 
 
 const updateLikeBtn = (likeBtn, haveLiked) => {
