@@ -432,6 +432,94 @@ const createPost = (post) => {
           postContent.append(postTitle, startTimeContainer, jobDetail, descriptionImg);
           feedPost.appendChild(postContent);
 
+          // create post main content
+          postContent.className = "post-content";
+          postContent.style.width = "100%";
+          // create post title
+          postTitle.className = "post-title";
+          postTitle.innerText = post.title;
+          // create job description
+          jobDetail.className = "post-job-detail";
+          jobDetail.innerText = post.description;
+          //create img element
+          descriptionImg.classList.add("img-fluid", "img-thumbnail");
+          descriptionImg.style.width = "100%";
+          descriptionImg.src = post.image;
+
+          startTimeContainer.classList.add("start-time", "bg-info", "bg-opacity-10", "px-3", "py-2","my-2", "rounded-pill", "text-primary", "fw-bold", "d-inline-block");
+          startTimeContainer.innerText = `Start Date: ${formattedStartDate}`;
+          //comment section and likes
+          const commAndLikes = document.createElement("div");
+          commAndLikes.classList.add(
+            "container",
+            "d-flex",
+            "justify-content-between",
+            "align-items-center",
+            "mt-3",
+            "px-2"
+          );
+          // like button
+          const likeBtn = document.createElement("button");
+          const likeNum = post.likes.length;
+          likeBtn.innerText = `👍 ${likeNum > 0 ? likeNum : ""}`;
+          likeBtn.type = "button";
+          likeBtn.classList.add("btn", "btn-primary");
+
+          // liked by section
+          const likeBy = document.createElement("div");
+          likeBy.className = "like-by";
+          likeBy.classList.add("text-muted", "small", "mt-3", "mb-2", "d-block");
+          // New likes
+          let haveLiked = false;
+          let likeByContent = [];
+          likeByContent = post.likes.map(like => like.userName);
+          for (const e of post.likes) {
+            if (String(e.userId) === localStorage.getItem("userId")) {
+              haveLiked = true;
+              break;
+            }
+          }
+          likeBy.innerText = likeByContent.length > 0 ? `Liked by: ${likeByContent.join(', ')}` : 'No likes yet';
+          updateLikeBtn(likeBtn, haveLiked);
+          handleLikes(likeBtn, likeBy, post, currentUserName, haveLiked);
+
+          // comment button
+          const comBtn = document.createElement("button");
+          const comNum = post.comments.length;
+          comBtn.innerText = `💬 ${comNum > 0 ? comNum : ""}`;
+          comBtn.classList.add("btn", "btn-primary");
+
+          // comment section
+          const comSection = document.createElement("div");
+          comSection.classList.add(
+            "comment-section",
+            "container",
+            "bg-light",
+            "p-3",
+            "mt-2",
+            "rounded",
+            "hide"
+          );
+          const commentsList = document.createElement("div");
+          commentsList.classList.add("comments-list");
+
+          if (post.comments.length === 0) {
+            // If no comment show alert
+            const noComments = document.createElement("p");
+            noComments.classList.add("text-muted", "small", "fst-italic");
+            noComments.innerText = "No comments yet";
+            comSection.appendChild(noComments);
+          }
+          
+          if (post.comments.length > 0) {
+            Promise.all(post.comments.map(comment => 
+              createComment(comment)
+            )).then(commentElements => {
+              commentElements.forEach(commentElement => {
+              commentsList.appendChild(commentElement);
+              });
+            });
+          }
 
 
 // profile page logic
