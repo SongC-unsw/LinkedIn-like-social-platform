@@ -11,7 +11,6 @@ const showPage = (chosenPage) => {
 };
 
 const apiCall = (path, body, mtd) => {
-  // Method hardcoded as POST need improvement
   const token = localStorage.getItem("token");
   return fetch("http://localhost:5005/" + path, {
     method: mtd,
@@ -25,7 +24,6 @@ const apiCall = (path, body, mtd) => {
     .then((data) => {
       if (data.error) {
         errorPopup(data.error);
-        // return Promise.reject(new Error(data.error));
       } else {
         return Promise.resolve(data);
       }
@@ -46,20 +44,17 @@ const loadFeed = async (feed, startAt) => {
     const postElement = await createPost(post);
     feedContainer.appendChild(postElement);
   }; 
-  // setupPagination(feed, startAt);
   window.isLoading = false;
   return response.length;
 };
 
 const setupInfScroll = (feed) => {
-
   window.currentIndex = 0;
   window.isLoading = false;
   window.noMorePosts = false;
 
   window.scrollListener = () => {
     if (window.isLoading || window.noMorePosts) return;
-    
     const scrollPosition = window.scrollY + window.innerHeight;
     const pageHeight = document.documentElement.scrollHeight;
 
@@ -67,7 +62,7 @@ const setupInfScroll = (feed) => {
       window.isLoading = true;
       const spinner = document.querySelector(".loading");
       if (spinner) spinner.classList.remove("d-none");
-      
+
       loadFeed(feed, window.currentIndex + 5)
         .then((res) => {
           if (res === 0) {
@@ -75,7 +70,7 @@ const setupInfScroll = (feed) => {
             if (spinner) spinner.classList.add("d-none");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.error("Error loading:", err);
           window.isLoading = false;
           if (spinner) spinner.classList.add("d-none");
@@ -83,7 +78,8 @@ const setupInfScroll = (feed) => {
     }
   };
   window.addEventListener("scroll", window.scrollListener);
-}
+};
+
 const loadJob = async (userResponse) => {
   const container = document.querySelector(".job-posted-container");
   container.innerHTML = "";
