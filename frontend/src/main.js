@@ -35,7 +35,10 @@ const loadFeed = async (feed, startAt) => {
   const response = await apiCall(`job/feed/?start=${startAt}`,{},"GET");
   window.currentIndex = startAt;
   if (startAt === 0) {
-    document.querySelector(feed).innerHTML = "";
+    const feedContainer = document.querySelector(feed);
+    while (feedContainer.firstChild) {
+      feedContainer.removeChild(feedContainer.firstChild);
+    }
     setupInfScroll(feed);
   }
   response.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -82,7 +85,9 @@ const setupInfScroll = (feed) => {
 
 const loadJob = async (userResponse) => {
   const container = document.querySelector(".job-posted-container");
-  container.innerHTML = "";
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
   
   if (!userResponse.jobs || userResponse.jobs.length === 0) {
     const noJobsMessage = document.createElement("div");
@@ -558,7 +563,9 @@ const constructProfilePage = async (userResponse) => {
   
   // follow button logic
   const followBtnContainer = document.querySelector(".profile-follow-btn-container");
-  followBtnContainer.innerHTML = "";
+  while (followBtnContainer.firstChild) {
+    followBtnContainer.removeChild(followBtnContainer.firstChild);
+  }
   if (followBtnContainer) {
     const currentUserId = parseInt(localStorage.getItem("userId"));
     const currentUserObj = await apiCall(`user?userId=${currentUserId}`);
@@ -596,7 +603,9 @@ const constructProfilePage = async (userResponse) => {
       
       followBtnContainer.appendChild(followBtn);
     } else {
-      followBtnContainer.innerHTML = "";
+      while (followBtnContainer.firstChild) {
+        followBtnContainer.removeChild(followBtnContainer.firstChild);
+      }
       const updateProfileBtn = document.createElement("button");
       followBtnContainer.appendChild(updateProfileBtn);
       updateProfileBtn.className = "update-profile-btn btn btn-outline-dark";
