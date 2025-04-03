@@ -756,25 +756,30 @@ for (const element of homePageBtn) {
     showPage("home");
   });
 }
-const getCurrentUserDetail = async () => {
-  const userResponse = await apiCall(`user?userId=${localStorage.getItem("userId")}`,{},"GET");
-  return userResponse;
-}
 
-const updateUserDisplay = async () => {
+const getCurrentUserDetail = () => {
+  return apiCall(`user?userId=${localStorage.getItem("userId")}`, {}, "GET");
+};
+
+const updateUserDisplay = () => {
   const loggedInAs = document.getElementsByClassName("current-user-name");
-  for (const element of loggedInAs) {
-    element.classList.add("me-2");
-    element.style.cursor = "pointer";
-    const userResponse = await getCurrentUserDetail();
-    element.innerText = `Logged In As: ${userResponse.name}`;
-    element.addEventListener("click", async ()=> {
-      const userResponse = await apiCall(`user?userId=${localStorage.getItem("userId")}`,{},"GET");
-      constructProfilePage(userResponse)
-      showPage("profile");
-    })
-  }
-}
+  
+  return getCurrentUserDetail()
+    .then(userResponse => {
+      for (const element of loggedInAs) {
+        element.classList.add("me-2");
+        element.style.cursor = "pointer";
+        element.innerText = `Logged In As: ${userResponse.name}`;
+        element.addEventListener("click", () => {
+          apiCall(`user?userId=${localStorage.getItem("userId")}`, {}, "GET")
+            .then(userResponse => {
+              constructProfilePage(userResponse);
+              showPage("profile");
+            });
+        });
+      }
+    });
+};
 
 // edit profile logic
 const editEmail = document.getElementById("edit-email");
