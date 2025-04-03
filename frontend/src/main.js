@@ -785,14 +785,17 @@ const updateUserDisplay = () => {
 const editEmail = document.getElementById("edit-email");
 const editName = document.getElementById("edit-name");
 const editPassword = document.getElementById("edit-password");
-const updateUserValue = async () => {
+const updateUserValue = () => {
   const editAvatar = document.querySelector(".avatar-profile-edit");
-  const userDetail = await getCurrentUserDetail();
-  editAvatar.src = userDetail.image;
-  editEmail.value = userDetail.email;
-  editName.value = userDetail.name;
-  editPassword.value = '';
-}
+  return getCurrentUserDetail()
+    .then(userDetail => {
+      editAvatar.src = userDetail.image;
+      editEmail.value = userDetail.email;
+      editName.value = userDetail.name;
+      editPassword.value = '';
+      return userDetail;
+    });
+};
 if (localStorage.getItem("token")) {
   updateUserDisplay();
 }
@@ -820,29 +823,35 @@ fileInput.addEventListener('change', (event) => {
   }
 });
 const saveChanges = document.getElementById("save-profile");
-saveChanges.addEventListener("click", async (event)=>{
+saveChanges.addEventListener("click", (event) => {
   event.preventDefault();
-  saveChanges.innerText = "Saving..."
-  saveChanges.disable = true;
-  const userCurrentDetail = await getCurrentUserDetail();
-  const body = {
-    email: userCurrentDetail.email !== editEmail.value ? editEmail.value : undefined,
-    password: editPassword.value ? editPassword.value : undefined,
-    name: userCurrentDetail.name !== editName.value ? editName.value : undefined,
-    image: userCurrentDetail.image !== imageBase64 ? imageBase64 : undefined
-  }
-  await apiCall("user",body,"PUT");
-  saveChanges.classList.remove("btn-primary");
-  saveChanges.innerText = "Saved!";
-  saveChanges.classList.add("btn-success");
-  // Reset button state
-  setTimeout(() => {
-    saveChanges.innerText = "Save Changes";
-    saveChanges.classList.remove("btn-success");
-    saveChanges.classList.add("btn-primary");
-    saveChanges.disabled = false;
-  }, 800);
-})
+  saveChanges.innerText = "Saving...";
+  saveChanges.disabled = true;
+  
+  getCurrentUserDetail()
+    .then(userCurrentDetail => {
+      const body = {
+        email: userCurrentDetail.email !== editEmail.value ? editEmail.value : undefined,
+        password: editPassword.value ? editPassword.value : undefined,
+        name: userCurrentDetail.name !== editName.value ? editName.value : undefined,
+        image: userCurrentDetail.image !== imageBase64 ? imageBase64 : undefined
+      };
+      return apiCall("user", body, "PUT");
+    })
+    .then(() => {
+      saveChanges.classList.remove("btn-primary");
+      saveChanges.innerText = "Saved!";
+      saveChanges.classList.add("btn-success");
+      
+      // Reset button state
+      setTimeout(() => {
+        saveChanges.innerText = "Save Changes";
+        saveChanges.classList.remove("btn-success");
+        saveChanges.classList.add("btn-primary");
+        saveChanges.disabled = false;
+      }, 800);
+    });
+});
 // TODO Publish job posting
 const createNewJobBtn = document.querySelector(".create-job-post");
 createNewJobBtn.addEventListener("click", () => {
