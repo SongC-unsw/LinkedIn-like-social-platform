@@ -551,7 +551,7 @@ const createPost = async (post) => {
 };
 
 // profile page logic
-const constructProfilePage = async (userResponse) => {
+const constructProfilePage = (userResponse) => {
   const profilePagePic = document.querySelector(".profile-page-pic");
   const profileName = document.querySelector(".profile-page-username");
   const emailDetail = document.querySelector(".profile-email-value");
@@ -559,94 +559,100 @@ const constructProfilePage = async (userResponse) => {
   const followedBy = document.querySelector(".followed-by-name");
   const userWhoWatchMeIds = userResponse.usersWhoWatchMeUserIds;
   let followedByName = [];
-  for (const id of userWhoWatchMeIds) {
-    const user = await apiCall(`user?userId=${id}`,{},"GET");
-    if (user && user.name) {
-      followedByName.push(user.name);
-    }
-  }
-
-  followedBy.innerText = followedByName.join(", ");
-  emailDetail.innerText = userResponse.email;
-  watchCount.innerText = userWhoWatchMeIds.length;
-  profilePagePic.replaceChildren();
-  profileName.innerText = userResponse.name;
-  const avatarContainer = document.createElement("div");
-  profilePagePic.appendChild(avatarContainer);
-  avatarContainer.className = "profile-avatar-container rounded-circle bg-secondary fs-3 text-white d-flex justify-content-center align-items-center";
-  avatarContainer.style.width = "70px";
-  avatarContainer.style.height = "70px";
-  if (userResponse.image) {
-    const profileImg = document.createElement("img");
-    profileImg.className = "profile-image";
-    profileImg.src = userResponse.image;
-    profileImg.style.width = "70px";
-    profileImg.style.height = "70px";
-    avatarContainer.classList.remove("bg-secondary");
-    profileImg.classList.add("rounded-circle");
-    avatarContainer.appendChild(profileImg);    
-  } else {
-    avatarContainer.textContent = userResponse.name ? userResponse.name.charAt(0) : "U";
-  }
-  
-  // follow button logic
-  const followBtnContainer = document.querySelector(".profile-follow-btn-container");
-  while (followBtnContainer.firstChild) {
-    followBtnContainer.removeChild(followBtnContainer.firstChild);
-  }
-  if (followBtnContainer) {
-    const currentUserId = parseInt(localStorage.getItem("userId"));
-    const currentUserObj = await apiCall(`user?userId=${currentUserId}`);
-    const currentUserName = currentUserObj.name;
-    if (userResponse.id !== currentUserId) {
-      const followBtn = document.createElement("button");
-      followBtn.className = "btn btn-primary";
-      
-      // check if is following
-      let isFollowing = userResponse.usersWhoWatchMeUserIds.includes(currentUserId);
-      updateFollowBtn(followBtn, isFollowing);
-      
-      // followBtn functionality
-      followBtn.addEventListener("click", async () => {
-        isFollowing = !isFollowing;
-        updateFollowBtn(followBtn, isFollowing);
-        
-        await apiCall("user/watch", {
-          email: userResponse.email,
-          turnon: isFollowing
-        }, "PUT");
-        
-        // update watch count
-        const updatedUser = await apiCall(`user?userId=${userResponse.id}`, {}, "GET");
-        watchCount.innerText = updatedUser.usersWhoWatchMeUserIds.length;
-        if (isFollowing) {
-          if (!followedByName.includes(currentUserName)) {
-            followedByName.unshift(currentUserName);
-          }
-        } else {
-          followedByName = followedByName.filter(name => name !== currentUserName)
-        }
-        followedBy.innerText = followedByName.join(", ");
-      });
-      
-      followBtnContainer.appendChild(followBtn);
+  return Promise.all(
+    userWhoWatchMeIds.map(id => 
+      apiCall(`user?userId=${id}`, {}, "GET")
+    )
+  )
+  .then(users => {
+    followedByName = users
+      .filter(user => user && user.name)
+      .map(user => user.name);
+    followedBy.innerText = followedByName.join(", ");
+    emailDetail.innerText = userResponse.email;
+    watchCount.innerText = userWhoWatchMeIds.length;
+    profilePagePic.replaceChildren();
+    profileName.innerText = userResponse.name;
+    
+    const avatarContainer = document.createElement("div");
+    profilePagePic.appendChild(avatarContainer);
+    avatarContainer.className = "profile-avatar-container rounded-circle bg-secondary fs-3 text-white d-flex justify-content-center align-items-center";
+    avatarContainer.style.width = "70px";
+    avatarContainer.style.height = "70px";
+    
+    if (userResponse.image) {
+      const profileImg = document.createElement("img");
+      profileImg.className = "profile-image";
+      profileImg.src = userResponse.image;
+      profileImg.style.width = "70px";
+      profileImg.style.height = "70px";
+      avatarContainer.classList.remove("bg-secondary");
+      profileImg.classList.add("rounded-circle");
+      avatarContainer.appendChild(profileImg);    
     } else {
-      while (followBtnContainer.firstChild) {
-        followBtnContainer.removeChild(followBtnContainer.firstChild);
-      }
-      const updateProfileBtn = document.createElement("button");
-      followBtnContainer.appendChild(updateProfileBtn);
-      updateProfileBtn.className = "update-profile-btn btn btn-outline-dark";
-      updateProfileBtn.innerText = "📝 Edit your profile";
-      updateProfileBtn.addEventListener("click", () => {
-        updateUserValue();
-        showPage("profile-edit");
-      })
+      avatarContainer.textContent = userResponse.name ? userResponse.name.charAt(0) : "U";
     }
-  }
-  // job-posting made by this person
-  loadJob(userResponse);
-}
+    
+    // follow button logic
+    const followBtnContainer = document.querySelector(".profile-follow-btn-container");
+    while (followBtnContainer.firstChild) {
+      followBtnContainer.removeChild(followBtnContainer.firstChild);
+    }
+    
+    if (followBtnContainer) {
+      const currentUserId = parseInt(localStorage.getItem("userId"));
+      return apiCall(`user?userId=${currentUserId}`, {}, "GET")
+        .then(currentUserObj => {
+          const currentUserName = currentUserObj.name;
+          if (userResponse.id !== currentUserId) {
+            const followBtn = document.createElement("button");
+            followBtn.className = "btn btn-primary";
+            let isFollowing = userResponse.usersWhoWatchMeUserIds.includes(currentUserId);
+            updateFollowBtn(followBtn, isFollowing);
+            followBtn.addEventListener("click", () => {
+              isFollowing = !isFollowing;
+              updateFollowBtn(followBtn, isFollowing);
+              
+              apiCall("user/watch", {
+                email: userResponse.email,
+                turnon: isFollowing
+              }, "PUT")
+              .then(() => {
+                return apiCall(`user?userId=${userResponse.id}`, {}, "GET");
+              })
+              .then(updatedUser => {
+                watchCount.innerText = updatedUser.usersWhoWatchMeUserIds.length;
+                if (isFollowing) {
+                  if (!followedByName.includes(currentUserName)) {
+                    followedByName.unshift(currentUserName);
+                  }
+                } else {
+                  followedByName = followedByName.filter(name => name !== currentUserName);
+                }
+                followedBy.innerText = followedByName.join(", ");
+              });
+            });
+            followBtnContainer.appendChild(followBtn);
+          } else {
+            while (followBtnContainer.firstChild) {
+              followBtnContainer.removeChild(followBtnContainer.firstChild);
+            }
+            const updateProfileBtn = document.createElement("button");
+            followBtnContainer.appendChild(updateProfileBtn);
+            updateProfileBtn.className = "update-profile-btn btn btn-outline-dark";
+            updateProfileBtn.innerText = "📝 Edit your profile";
+            updateProfileBtn.addEventListener("click", () => {
+              updateUserValue();
+              showPage("profile-edit");
+            });
+          }
+          return loadJob(userResponse);
+        });
+    }
+
+    return loadJob(userResponse);
+  });
+};
 
 const updateFollowBtn = (btn, isFollowing) => {
   if (isFollowing) {
