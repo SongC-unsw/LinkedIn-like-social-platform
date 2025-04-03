@@ -31,24 +31,31 @@ const apiCall = (path, body, mtd) => {
 };
 
 // feed logic
-const loadFeed = async (feed, startAt) => {
-  const response = await apiCall(`job/feed/?start=${startAt}`,{},"GET");
-  window.currentIndex = startAt;
-  if (startAt === 0) {
-    const feedContainer = document.querySelector(feed);
-    while (feedContainer.firstChild) {
-      feedContainer.removeChild(feedContainer.firstChild);
-    }
-    setupInfScroll(feed);
-  }
-  response.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  const feedContainer = document.querySelector(feed);
-  for (const post of response) {
-    const postElement = await createPost(post);
-    feedContainer.appendChild(postElement);
-  }; 
-  window.isLoading = false;
-  return response.length;
+const loadFeed = (feed, startAt) => {
+  return apiCall(`job/feed/?start=${startAt}`,{},"GET")
+    .then((response) => {
+      window.currentIndex = startAt;
+      if (startAt === 0) {
+        const feedContainer = document.querySelector(feed);
+        while (feedContainer.firstChild) {
+          feedContainer.removeChild(feedContainer.firstChild);
+        }
+        setupInfScroll(feed);
+      }
+      response.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const feedContainer = document.querySelector(feed);
+      
+      const postPromises = response.map(post => 
+        createPost(post).then(postElement => {
+          feedContainer.appendChild(postElement);
+        })
+      );
+      
+      return Promise.all(postPromises).then(() => {
+        window.isLoading = false;
+        return response.length;
+      });
+    });
 };
 
 const setupInfScroll = (feed) => {
