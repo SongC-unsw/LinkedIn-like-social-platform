@@ -521,6 +521,42 @@ const createPost = (post) => {
             });
           }
 
+          
+          comSection.appendChild(commentsList);
+          // Add new comment
+          const commentForm = document.createElement("div");
+          commentForm.classList.add("comment-form", "mt-3", "d-flex");
+
+          const commentInput = document.createElement("input");
+          commentInput.type = "text";
+          commentInput.required = true;
+          commentInput.classList.add("form-control", "form-control-sm", "me-2");
+          commentInput.placeholder = "Add a comment...";
+
+          const commentSubmit = document.createElement("button");
+          commentSubmit.classList.add("btn", "btn-sm", "btn-primary");
+          commentSubmit.innerText = "Post";
+
+          // dynamically add comments functionality
+          handlePostComment(commentSubmit, commentInput, currentUserName, commentsList, comBtn, post);
+          commentForm.appendChild(commentInput);
+          commentForm.appendChild(commentSubmit);
+          comSection.appendChild(commentForm);
+
+          // Toggle comments when clicking the comment button
+          comBtn.addEventListener("click", () => {
+            comSection.classList.toggle("hide");
+          });
+
+          commAndLikes.append(likeBtn, comBtn);
+          feedPost.appendChild(commAndLikes);
+          feedPost.appendChild(likeBy);
+          feedPost.appendChild(comSection);
+          return feedPost;
+        });
+    });
+};
+
 
 // profile page logic
 const constructProfilePage = (userResponse) => {
