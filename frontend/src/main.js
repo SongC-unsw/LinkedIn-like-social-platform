@@ -345,6 +345,94 @@ const createPost = (post) => {
             }
           });
 
+          // profile pic
+          const profilePic = document.createElement("div");
+          profilePic.className = "profile-picture rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center";
+          profilePic.style.width = "50px";
+          profilePic.style.height = "50px";
+          profilePic.style.fontSize = "1.3rem";
+          if (response.image) {
+            const profileImg = document.createElement("img");
+            profileImg.className = "profile-image";
+            profileImg.src = response.image;
+            profileImg.style.width = "50px";
+            profileImg.style.height = "50px";
+            profilePic.classList.remove("bg-secondary");
+            profileImg.classList.add("rounded-circle");
+            profilePic.appendChild(profileImg);    
+          } else {
+            profilePic.textContent = creatorName ? creatorName.charAt(0) : "U";
+          }
+          
+          const pfpContainer = document.createElement("div");
+          pfpContainer.style.width = "50px";
+          pfpContainer.style.flexShrink = "0";
+          pfpContainer.appendChild(profilePic);
+          topSection.appendChild(pfpContainer);
+
+          // create name element
+          const nameElement = document.createElement("div");
+          nameElement.className = "author-name fw-bold";
+          nameElement.innerText = creatorName;
+          nameElement.style.cursor = "pointer";
+          nameElement.style.fontSize = "1.3rem";
+          nameElement.addEventListener("click", ()=>{
+            constructProfilePage(response);
+            showPage("profile");
+          })
+
+          // Create time element
+          const timeElement = document.createElement("div");
+          timeElement.className = "post-time";
+          timeElement.classList.add("text-secondary");
+          timeElement.style.fontSize = "0.8rem";
+          const now = new Date();
+          const timeCreated = new Date(post.createdAt);
+          if (now - timeCreated > 86400000) {
+            // if greater than a day
+            const year = timeCreated.getFullYear();
+            const day = String(timeCreated.getDate()).padStart(2, "0");
+            const month = String(timeCreated.getMonth() + 1).padStart(2, "0");
+
+            timeElement.innerText = `Posted on ${day}/${month}/${year}`; // DD/MM/YYYY
+          } else {
+            const diffInMs = now - timeCreated;
+            const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+            const diffInHours = Math.floor(diffInMinutes / 60);
+            const reaminderMinutes = diffInMinutes % 60;
+            timeElement.innerText = `Posted ${diffInHours} ${
+              diffInHours > 1 ? "hours" : "hour"
+            } and ${reaminderMinutes} ${
+              reaminderMinutes > 1 ? "minutes" : "minute"
+            } ago`;
+            // time display format
+          }
+
+          // top section styling
+          postHeader.style.display = "flex";
+          postHeader.style.flexDirection = "column";
+          topSection.style.display = "flex";
+          postHeader.classList.add("ms-3"); // adds margin-left
+          topSection.classList.add("mb-3");
+
+          // Append elements to header
+          postHeader.appendChild(nameElement);
+          postHeader.appendChild(timeElement);
+          topSection.appendChild(postHeader);
+          topSection.appendChild(buttonDiv);
+          feedPost.appendChild(topSection);
+          // append element to main content
+          const postContent = document.createElement("div");
+          const postTitle = document.createElement("h4");
+          const jobDetail = document.createElement("p");
+          const descriptionImg = document.createElement("img");
+          const startTime = new Date(post.start);
+          const formattedStartDate = startTime.toLocaleDateString('en-GB'); // DD/MM/YYYY format
+          const startTimeContainer = document.createElement("div");
+          postContent.append(postTitle, startTimeContainer, jobDetail, descriptionImg);
+          feedPost.appendChild(postContent);
+
+
 
 // profile page logic
 const constructProfilePage = (userResponse) => {
