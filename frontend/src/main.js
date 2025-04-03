@@ -90,7 +90,7 @@ const setupInfScroll = (feed) => {
   window.addEventListener("scroll", window.scrollListener);
 };
 
-const loadJob = async (userResponse) => {
+const loadJob = (userResponse) => {
   const container = document.querySelector(".job-posted-container");
   while (container.firstChild) {
     container.removeChild(container.firstChild);
@@ -101,17 +101,20 @@ const loadJob = async (userResponse) => {
     noJobsMessage.className = "alert alert-info text-center";
     noJobsMessage.innerText = "No jobs posted yet";
     container.appendChild(noJobsMessage);
-    return;
+    return Promise.resolve();
   }
 
   const jobs = userResponse.jobs;
   jobs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-  for (const post of jobs) {
-    const postElement = await createPost(post);
-    container.appendChild(postElement);
-  }; 
-};
+  const jobPromises = jobs.map(post => 
+    createPost(post).then(postElement => {
+      container.appendChild(postElement);
+    })
+  );
+  
+  return Promise.all(jobPromises);
+}; 
 
 const updateLikeBtn = (likeBtn, haveLiked) => {
   if (haveLiked) {
