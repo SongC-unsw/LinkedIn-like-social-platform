@@ -248,8 +248,8 @@ const handlePostComment = (commentSubmit, commentInput, currentUserName, comment
   })
 };
 
-const createPost = async (post) => {
-  // async function to deal with apicall
+const createPost = (post) => {
+  // Promise-based function to deal with apicall
   // post here is a response object
   console.log(post);
   const feedPost = document.createElement("div");
@@ -265,293 +265,86 @@ const createPost = async (post) => {
   const postHeader = document.createElement("div");
   postHeader.className = "post-header";
   
-  const response = await apiCall(`user?userId=${post.creatorId}`, {}, "GET");
-  const currentUserObj = await apiCall(`user?userId=${localStorage.getItem("userId")}`, {}, "GET");
-  const currentUserName = currentUserObj.name;
-  const creatorName = response.name;
-  // delete button and edit button
-  const buttonDiv = document.createElement("div");
-  const deletePostBtn = document.createElement("button");
-  const editPostBtn = document.createElement("button");
-  buttonDiv.append(editPostBtn, deletePostBtn);
-  buttonDiv.classList.add("ms-auto");
-  deletePostBtn.className = "btn btn-light d-none";
-  editPostBtn.className = "btn btn-light d-none";
-  editPostBtn.innerText = "✏️ Edit Post";
-  deletePostBtn.innerText = "🗑️ Delete";
-  if (post.creatorId === parseInt(localStorage.getItem("userId"))) {
-    editPostBtn.classList.remove("d-none");
-    deletePostBtn.classList.remove("d-none");
-  }
-  deletePostBtn.addEventListener("click", () => {
-    apiCall("job", { id: post.id }, "DELETE")
-    .then(() => {
-      feedPost.remove();
-    });
-  });
+  return apiCall(`user?userId=${post.creatorId}`, {}, "GET")
+    .then((response) => {
+      return apiCall(`user?userId=${localStorage.getItem("userId")}`, {}, "GET")
+        .then((currentUserObj) => {
+          const currentUserName = currentUserObj.name;
+          const creatorName = response.name;
+          // delete button and edit button
+          const buttonDiv = document.createElement("div");
+          const deletePostBtn = document.createElement("button");
+          const editPostBtn = document.createElement("button");
+          buttonDiv.append(editPostBtn, deletePostBtn);
+          buttonDiv.classList.add("ms-auto");
+          deletePostBtn.className = "btn btn-light d-none";
+          editPostBtn.className = "btn btn-light d-none";
+          editPostBtn.innerText = "✏️ Edit Post";
+          deletePostBtn.innerText = "🗑️ Delete";
+          if (post.creatorId === parseInt(localStorage.getItem("userId"))) {
+            editPostBtn.classList.remove("d-none");
+            deletePostBtn.classList.remove("d-none");
+          }
+          deletePostBtn.addEventListener("click", () => {
+            apiCall("job", { id: post.id }, "DELETE")
+            .then(() => {
+              feedPost.remove();
+            });
+          });
 
-  editPostBtn.addEventListener("click", () => {
-    const jobTitleEdit = document.getElementById("job-title");
-    jobTitleEdit.value = post.title;
-    const jobDescriptionEdit = document.getElementById("job-text");
-    jobDescriptionEdit.textContent = post.description;
-    const startDatePicker = document.getElementById("dateInput");
-    const formattedDate = new Date(post.start).toLocaleDateString('en-CA', { timeZone: 'Australia/Sydney' });
-    startDatePicker.value = formattedDate;
-    const currentImgDisplay = document.querySelector(".current-image-display");
-    currentImgDisplay.src = post.image;
-    editPostPopup();
-    
-    const editPostSave = document.querySelector(".save-job-edit");
-    editPostSave.addEventListener("click", ()=> {
-      const updatedTitle = document.getElementById("job-title").value;
-      const updatedDescription = document.getElementById("job-text").value;
-      const updatedStartDate = new Date(document.getElementById("dateInput").value);
-      const updatedImage = currentImgDisplay.src;
-  
-      apiCall("job", {
-        id: post.id,
-        title: updatedTitle,
-        description: updatedDescription,
-        start: updatedStartDate,
-        image: updatedImage
-      }, "PUT").then(() => {
-        editPostSave.classList.remove("btn-primary");
-        editPostSave.classList.add("btn-success");
-        editPostSave.innerText = "Saved!";
-        setTimeout(() => {
-          editPostSave.classList.remove("btn-success");
-          editPostSave.classList.add("btn-primary");
-          editPostSave.innerText = "Save Changes";
-        }, 800);
-      });
-    });
-  });
+          editPostBtn.addEventListener("click", () => {
+            const jobTitleEdit = document.getElementById("job-title");
+            jobTitleEdit.value = post.title;
+            const jobDescriptionEdit = document.getElementById("job-text");
+            jobDescriptionEdit.textContent = post.description;
+            const startDatePicker = document.getElementById("dateInput");
+            const formattedDate = new Date(post.start).toLocaleDateString('en-CA', { timeZone: 'Australia/Sydney' });
+            startDatePicker.value = formattedDate;
+            const currentImgDisplay = document.querySelector(".current-image-display");
+            currentImgDisplay.src = post.image;
+            editPostPopup();
+            
+            const editPostSave = document.querySelector(".save-job-edit");
+            editPostSave.addEventListener("click", ()=> {
+              const updatedTitle = document.getElementById("job-title").value;
+              const updatedDescription = document.getElementById("job-text").value;
+              const updatedStartDate = new Date(document.getElementById("dateInput").value);
+              const updatedImage = currentImgDisplay.src;
+          
+              apiCall("job", {
+                id: post.id,
+                title: updatedTitle,
+                description: updatedDescription,
+                start: updatedStartDate,
+                image: updatedImage
+              }, "PUT").then(() => {
+                editPostSave.classList.remove("btn-primary");
+                editPostSave.classList.add("btn-success");
+                editPostSave.innerText = "Saved!";
+                setTimeout(() => {
+                  editPostSave.classList.remove("btn-success");
+                  editPostSave.classList.add("btn-primary");
+                  editPostSave.innerText = "Save Changes";
+                }, 800);
+              });
+            });
+          });
+          const currentImgInput = document.getElementById("job-image-upload");
+          const currentImgDisplay = document.querySelector(".current-image-display");
+          currentImgInput.addEventListener("change", (event) => {
+            const file = event.target.files[0];
+            if (file) {
+              fileToDataUrl(file)
+                .then((base64Data) => {
+                  currentImgDisplay.src = base64Data;
+                })
+                .catch((error) => {
+                  console.error("Error converting image:", error);
+                  errorPopup("Failed to process the image");
+                });
+            }
+          });
 
-  const currentImgInput = document.getElementById("job-image-upload");
-  const currentImgDisplay = document.querySelector(".current-image-display");
-  currentImgInput.addEventListener("change", (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      fileToDataUrl(file)
-        .then((base64Data) => {
-          currentImgDisplay.src = base64Data;
-        })
-        .catch((error) => {
-          console.error("Error converting image:", error);
-          errorPopup("Failed to process the image");
-        });
-    }
-  });
-
-  // profile pic
-  const profilePic = document.createElement("div");
-  profilePic.className = "profile-picture rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center";
-  profilePic.style.width = "50px";
-  profilePic.style.height = "50px";
-  profilePic.style.fontSize = "1.3rem";
-  if (response.image) {
-    const profileImg = document.createElement("img");
-    profileImg.className = "profile-image";
-    profileImg.src = response.image;
-    profileImg.style.width = "50px";
-    profileImg.style.height = "50px";
-    profilePic.classList.remove("bg-secondary");
-    profileImg.classList.add("rounded-circle");
-    profilePic.appendChild(profileImg);    
-  } else {
-    profilePic.textContent = creatorName ? creatorName.charAt(0) : "U";
-  }
-  
-  const pfpContainer = document.createElement("div");
-  pfpContainer.style.width = "50px";
-  pfpContainer.style.flexShrink = "0";
-  pfpContainer.appendChild(profilePic);
-  topSection.appendChild(pfpContainer);
-
-  // create name element
-  const nameElement = document.createElement("div");
-  nameElement.className = "author-name fw-bold";
-  nameElement.innerText = creatorName;
-  nameElement.style.cursor = "pointer";
-  nameElement.style.fontSize = "1.3rem";
-  nameElement.addEventListener("click", ()=>{
-    constructProfilePage(response);
-    showPage("profile");
-  })
-
-  // Create time element
-  const timeElement = document.createElement("div");
-  timeElement.className = "post-time";
-  timeElement.classList.add("text-secondary");
-  timeElement.style.fontSize = "0.8rem";
-  const now = new Date();
-  const timeCreated = new Date(post.createdAt);
-  if (now - timeCreated > 86400000) {
-    // if greater than a day
-    const year = timeCreated.getFullYear();
-    const day = String(timeCreated.getDate()).padStart(2, "0");
-    const month = String(timeCreated.getMonth() + 1).padStart(2, "0");
-
-    timeElement.innerText = `Posted on ${day}/${month}/${year}`; // DD/MM/YYYY
-  } else {
-    const diffInMs = now - timeCreated;
-    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    const reaminderMinutes = diffInMinutes % 60;
-    timeElement.innerText = `Posted ${diffInHours} ${
-      diffInHours > 1 ? "hours" : "hour"
-    } and ${reaminderMinutes} ${
-      reaminderMinutes > 1 ? "minutes" : "minute"
-    } ago`;
-    // time display format
-  }
-
-  // top section styling
-  postHeader.style.display = "flex";
-  postHeader.style.flexDirection = "column";
-  topSection.style.display = "flex";
-  postHeader.classList.add("ms-3"); // adds margin-left
-  topSection.classList.add("mb-3");
-
-  // Append elements to header
-  postHeader.appendChild(nameElement);
-  postHeader.appendChild(timeElement);
-  topSection.appendChild(postHeader);
-  topSection.appendChild(buttonDiv);
-  feedPost.appendChild(topSection);
-  // append element to main content
-  const postContent = document.createElement("div");
-  const postTitle = document.createElement("h4");
-  const jobDetail = document.createElement("p");
-  const descriptionImg = document.createElement("img");
-  const startTime = new Date(post.start);
-  const formattedStartDate = startTime.toLocaleDateString('en-GB'); // DD/MM/YYYY format
-  const startTimeContainer = document.createElement("div");
-  postContent.append(postTitle, startTimeContainer, jobDetail, descriptionImg);
-  feedPost.appendChild(postContent);
-
-  // create post main content
-  postContent.className = "post-content";
-  postContent.style.width = "100%";
-  // create post title
-  postTitle.className = "post-title";
-  postTitle.innerText = post.title;
-  // create job description
-  jobDetail.className = "post-job-detail";
-  jobDetail.innerText = post.description;
-  //create img element
-  descriptionImg.classList.add("img-fluid", "img-thumbnail");
-  descriptionImg.style.width = "100%";
-  descriptionImg.src = post.image;
-
-  startTimeContainer.classList.add("start-time", "bg-info", "bg-opacity-10", "px-3", "py-2","my-2", "rounded-pill", "text-primary", "fw-bold", "d-inline-block");
-  startTimeContainer.innerText = `Start Date: ${formattedStartDate}`;
-  //comment section and likes
-  const commAndLikes = document.createElement("div");
-  commAndLikes.classList.add(
-    "container",
-    "d-flex",
-    "justify-content-between",
-    "align-items-center",
-    "mt-3",
-    "px-2"
-  );
-  // like button
-  const likeBtn = document.createElement("button");
-  const likeNum = post.likes.length;
-  likeBtn.innerText = `👍 ${likeNum > 0 ? likeNum : ""}`;
-  likeBtn.type = "button";
-  likeBtn.classList.add("btn", "btn-primary");
-
-  // liked by section
-  const likeBy = document.createElement("div");
-  likeBy.className = "like-by";
-  likeBy.classList.add("text-muted", "small", "mt-3", "mb-2", "d-block");
-  // New likes
-  let haveLiked = false;
-  let likeByContent = [];
-  likeByContent = post.likes.map(like => like.userName);
-  for (const e of post.likes) {
-    if (String(e.userId) === localStorage.getItem("userId")) {
-      haveLiked = true;
-      break;
-    }
-  }
-  likeBy.innerText = likeByContent.length > 0 ? `Liked by: ${likeByContent.join(', ')}` : 'No likes yet';
-  updateLikeBtn(likeBtn, haveLiked);
-  handleLikes(likeBtn, likeBy, post, currentUserName, haveLiked);
-
-  // comment button
-  const comBtn = document.createElement("button");
-  const comNum = post.comments.length;
-  comBtn.innerText = `💬 ${comNum > 0 ? comNum : ""}`;
-  comBtn.classList.add("btn", "btn-primary");
-
-  // comment section
-  const comSection = document.createElement("div");
-  comSection.classList.add(
-    "comment-section",
-    "container",
-    "bg-light",
-    "p-3",
-    "mt-2",
-    "rounded",
-    "hide"
-  );
-  const commentsList = document.createElement("div");
-  commentsList.classList.add("comments-list");
-
-  if (post.comments.length === 0) {
-    // If no comment show alert
-    const noComments = document.createElement("p");
-    noComments.classList.add("text-muted", "small", "fst-italic");
-    noComments.innerText = "No comments yet";
-    comSection.appendChild(noComments);
-  }
-  
-  if (post.comments.length > 0) {
-    Promise.all(post.comments.map(comment => 
-      createComment(comment)
-    )).then(commentElements => {
-      commentElements.forEach(commentElement => {
-      commentsList.appendChild(commentElement);
-      });
-    });
-  }
-  
-  comSection.appendChild(commentsList);
-  // Add new comment
-  const commentForm = document.createElement("div");
-  commentForm.classList.add("comment-form", "mt-3", "d-flex");
-
-  const commentInput = document.createElement("input");
-  commentInput.type = "text";
-  commentInput.required = true;
-  commentInput.classList.add("form-control", "form-control-sm", "me-2");
-  commentInput.placeholder = "Add a comment...";
-
-  const commentSubmit = document.createElement("button");
-  commentSubmit.classList.add("btn", "btn-sm", "btn-primary");
-  commentSubmit.innerText = "Post";
-
-  // dynamically add comments functionality
-  handlePostComment(commentSubmit, commentInput, currentUserName, commentsList, comBtn, post);
-  commentForm.appendChild(commentInput);
-  commentForm.appendChild(commentSubmit);
-  comSection.appendChild(commentForm);
-
-  // Toggle comments when clicking the comment button
-  comBtn.addEventListener("click", () => {
-    comSection.classList.toggle("hide");
-  });
-
-  commAndLikes.append(likeBtn, comBtn);
-  feedPost.appendChild(commAndLikes);
-  feedPost.appendChild(likeBy);
-  feedPost.appendChild(comSection);
-  return feedPost;
-};
 
 // profile page logic
 const constructProfilePage = (userResponse) => {
