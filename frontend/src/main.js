@@ -150,7 +150,7 @@ const handleLikes = (likeBtn, likeBy, post, currentUserName, haveLiked) => {
 });
 };
 
-const createComment = async (comment) => {
+const createComment = (comment) => {
   // Display existing comments
   const commentItem = document.createElement("div");
   commentItem.classList.add(
@@ -161,73 +161,78 @@ const createComment = async (comment) => {
     "border-bottom"
   );
   // Comment user avatar (placeholder)
-  const userResponse = await apiCall(`user?userId=${comment.userId}`,{},"GET");
-  const userAvatar = userResponse.image;
-  const commentAvatar = document.createElement("div");
-  commentAvatar.classList.add("comment-avatar", "me-2");
-  const avatarContainer = document.createElement("div");
-  avatarContainer.className =
-    "rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center";
-  avatarContainer.style.width = "32px";
-  avatarContainer.style.height = "32px";
-  avatarContainer.style.fontSize = "14px";
-  if (userAvatar) {
-    const userCommentImg = document.createElement("img");
-    userCommentImg.className = "user-comment-image rounded-circle";
-    userCommentImg.alt = "user-profile-img";
-    userCommentImg.style.width = "32px";
-    userCommentImg.style.width = "32px";
-    userCommentImg.src = userAvatar;
-    avatarContainer.appendChild(userCommentImg);
-  } else {
-    avatarContainer.textContent = comment.userName
-      ? comment.userName.charAt(0)
-      : "U";
-  }
-  commentAvatar.appendChild(avatarContainer);
+  return apiCall(`user?userId=${comment.userId}`,{},"GET")
+    .then((userResponse) => {
+      const userAvatar = userResponse.image;
+      const commentAvatar = document.createElement("div");
+      commentAvatar.classList.add("comment-avatar", "me-2");
+      const avatarContainer = document.createElement("div");
+      avatarContainer.className =
+        "rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center";
+      avatarContainer.style.width = "32px";
+      avatarContainer.style.height = "32px";
+      avatarContainer.style.fontSize = "14px";
+      if (userAvatar) {
+        const userCommentImg = document.createElement("img");
+        userCommentImg.className = "user-comment-image rounded-circle";
+        userCommentImg.alt = "user-profile-img";
+        userCommentImg.style.width = "32px";
+        userCommentImg.style.width = "32px";
+        userCommentImg.src = userAvatar;
+        avatarContainer.appendChild(userCommentImg);
+      } else {
+        avatarContainer.textContent = comment.userName
+          ? comment.userName.charAt(0)
+          : "U";
+      }
+      commentAvatar.appendChild(avatarContainer);
 
-  // Comment content
-  const commentContent = document.createElement("div");
-  commentContent.classList.add("comment-content", "flex-grow-1");
-  // Comment user name
-  const commentUser = document.createElement("div");
-  commentUser.classList.add("comment-user", "fw-bold", "small");
-  commentUser.innerText = comment.userName;
-  commentUser.style.cursor = "pointer";
-  commentUser.addEventListener("click", () => {
-    constructProfilePage(userResponse);
-    showPage("profile");
-  })
+      // Comment content
+      const commentContent = document.createElement("div");
+      commentContent.classList.add("comment-content", "flex-grow-1");
+      // Comment user name
+      const commentUser = document.createElement("div");
+      commentUser.classList.add("comment-user", "fw-bold", "small");
+      commentUser.innerText = comment.userName;
+      commentUser.style.cursor = "pointer";
+      commentUser.addEventListener("click", () => {
+        constructProfilePage(userResponse);
+        showPage("profile");
+      })
 
-  const commentText = document.createElement("div");
-  commentText.classList.add("comment-text", "small","text-break","text-wrap");
-  commentText.innerText = comment.comment;
-  // assemble comment section
-  commentContent.appendChild(commentUser);
-  commentContent.appendChild(commentText);
-  commentItem.appendChild(commentAvatar);
-  commentItem.appendChild(commentContent);
-  
-  return commentItem;
+      const commentText = document.createElement("div");
+      commentText.classList.add("comment-text", "small","text-break","text-wrap");
+      commentText.innerText = comment.comment;
+      // assemble comment section
+      commentContent.appendChild(commentUser);
+      commentContent.appendChild(commentText);
+      commentItem.appendChild(commentAvatar);
+      commentItem.appendChild(commentContent);
+      
+      return commentItem;
+    });
 };
+
 // handle comments
 const handlePostComment = (commentSubmit, commentInput, currentUserName, commentsList, comBtn, post) => {
-  commentSubmit.addEventListener("click", async () => {
-    if (commentInput.value){
+  commentSubmit.addEventListener("click", () => {
+    if (commentInput.value) {
       // add comment
       const body = {userId: localStorage.getItem("userId"),userName: currentUserName,comment: commentInput.value}
-      const commentElement = await createComment(body);
-      commentsList.appendChild(commentElement);
-      comBtn.innerText = `💬 ${parseInt(comBtn.innerText.replace(/[^0-9]/g, '') || 0) + 1}`;
-      // api call
-      apiCall("job/comment", {
-        id: post.id,
-        comment: commentInput.value,
-      }, "POST");
-      commentInput.value = '';
+      
+      createComment(body)
+        .then(commentElement => {
+          commentsList.appendChild(commentElement);
+          comBtn.innerText = `💬 ${parseInt(comBtn.innerText.replace(/[^0-9]/g, '') || 0) + 1}`;
+          // api call
+          apiCall("job/comment", {
+            id: post.id,
+            comment: commentInput.value,
+          }, "POST");
+          commentInput.value = '';
+        });
     }
   })
-
 };
 
 const createPost = async (post) => {
