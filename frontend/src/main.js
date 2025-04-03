@@ -355,6 +355,7 @@ const createPost = (post) => {
             const profileImg = document.createElement("img");
             profileImg.className = "profile-image";
             profileImg.src = response.image;
+            profileImg.alt = "Profile Picture";
             profileImg.style.width = "50px";
             profileImg.style.height = "50px";
             profilePic.classList.remove("bg-secondary");
@@ -592,6 +593,7 @@ const constructProfilePage = (userResponse) => {
       const profileImg = document.createElement("img");
       profileImg.className = "profile-image";
       profileImg.src = userResponse.image;
+      profileImg.alt = "Profile Picture";
       profileImg.style.width = "70px";
       profileImg.style.height = "70px";
       avatarContainer.classList.remove("bg-secondary");
