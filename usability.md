@@ -21,7 +21,7 @@ The overall design employs the Bootstrap framework, with consistent interface st
 - Home page link is always on the nav bar, ensuring users never get stuck in a dead end
 
 ### 2. Accessibility Features
-- All images include appropriate alt text for screen reader compatibility
+- Perceivability: All images include appropriate alt text for screen reader compatibility
 - Semantic HTML elements used throughout the application (headers, sections, nav)
 - Form elements properly labeled with associated text
 - Sufficient color contrast ratios between text and backgrounds
