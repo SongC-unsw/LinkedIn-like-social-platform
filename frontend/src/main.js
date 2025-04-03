@@ -129,7 +129,7 @@ const handleLikes = (likeBtn, likeBy, post, currentUserName, haveLiked) => {
       currentLikedBy = currentLikedBy.filter(name => name !== currentUserName);
     }
     likeBy.innerText = currentLikedBy.length > 0 ? `Liked by: ${currentLikedBy.join(', ')}` : 'No likes yet';
-    // console.log(haveLiked, currentCount);
+
     currentCount = haveLiked? currentCount+1 : currentCount-1;
     likeBtn.innerText = `👍 ${currentCount > 0 ? currentCount : ''}`;
     apiCall("job/like", {
@@ -418,7 +418,6 @@ const createPost = async (post) => {
 
   startTimeContainer.classList.add("start-time", "bg-info", "bg-opacity-10", "px-3", "py-2","my-2", "rounded-pill", "text-primary", "fw-bold", "d-inline-block");
   startTimeContainer.innerText = `Start Date: ${formattedStartDate}`;
-  console.log(startTime);
   //comment section and likes
   const commAndLikes = document.createElement("div");
   commAndLikes.classList.add(
@@ -614,7 +613,6 @@ const constructProfilePage = async (userResponse) => {
   }
   // job-posting made by this person
   loadJob(userResponse);
-  console.log(userResponse);
 }
 
 const updateFollowBtn = (btn, isFollowing) => {
@@ -767,7 +765,6 @@ fileInput.addEventListener('change', (event) => {
       .then((base64Data) => {
         imageBase64 = base64Data;
         document.querySelector(".avatar-profile-edit").src = imageBase64;
-        console.log("Image converted to base64");
       })
       .catch((error) => {
         console.error("Error converting image:", error);
@@ -859,7 +856,6 @@ const setupNewJobPosting = () => {
   const jobImageUploadInput = document.getElementById("post-job-image-upload");
   const jobImageView = document.querySelector(".post-current-image-display");
   const postJobButton = document.querySelector(".post-job");
-  console.log(postJobButton);
   
   // Handle image upload preview
   jobImageUploadInput.addEventListener("change", (event) => {
