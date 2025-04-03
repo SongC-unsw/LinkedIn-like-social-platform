@@ -503,7 +503,7 @@ const createPost = async (post) => {
   commentsList.classList.add("comments-list");
 
   if (post.comments.length === 0) {
-    // 如果没有评论，显示提示信息
+    // If no comment show alert
     const noComments = document.createElement("p");
     noComments.classList.add("text-muted", "small", "fst-italic");
     noComments.innerText = "No comments yet";
@@ -511,10 +511,13 @@ const createPost = async (post) => {
   }
   
   if (post.comments.length > 0) {
-    await Promise.all(post.comments.map(async (comment) => {
-      const commentElement = await createComment(comment);
+    Promise.all(post.comments.map(comment => 
+      createComment(comment)
+    )).then(commentElements => {
+      commentElements.forEach(commentElement => {
       commentsList.appendChild(commentElement);
-    }));
+      });
+    });
   }
   
   comSection.appendChild(commentsList);
