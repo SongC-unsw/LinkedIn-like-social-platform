@@ -6,6 +6,13 @@
 
 LurkForWork 是一个功能完整的社交平台，允许用户发布工作机会、进行社交互动、建立职业联系。该项目使用 Vanilla Javascript 构建，通过利用 Bootstrap 框架提供流畅的用户体验和响应式设计。
 
+## 演示用账户
+
+```
+邮箱：demo@demo.com
+密码：123
+```
+
 ## 项目部署
 
 前端部署在 vercel, 后端用 railway 部署
