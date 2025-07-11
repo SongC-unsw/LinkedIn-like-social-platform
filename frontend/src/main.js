@@ -762,7 +762,7 @@ const updateFollowBtn = (btn, isFollowing) => {
 const loadRecommendedUsers = () => {
   // 创建一些示例推荐用户，您可以根据需要修改这些用户信息
   const recommendedUsers = [
-    { id: 101, name: "张三", email: "augustine@example.com", image: null },
+    { id: 101, name: "张三", email: "zhangsan@example.com", image: null },
     { id: 102, name: "李四", email: "lisi@example.com", image: null },
     { id: 103, name: "王五", email: "wangwu@example.com", image: null },
     { id: 104, name: "赵六", email: "zhaoliu@example.com", image: null },
@@ -857,21 +857,41 @@ const createRecommendedUserCard = (user) => {
   let isFollowing = false;
 
   followBtn.addEventListener("click", () => {
-    isFollowing = !isFollowing;
-    updateRecommendedFollowBtn(followBtn, isFollowing);
+    const newFollowState = !isFollowing;
 
-    // 显示关注状态反馈
-    const originalText = followBtn.innerText;
-    followBtn.innerText = isFollowing ? "✅ 已关注" : "✅ 已取消关注";
+    // 禁用按钮并显示加载状态
     followBtn.disabled = true;
+    followBtn.innerText = "处理中...";
 
-    setTimeout(() => {
-      updateRecommendedFollowBtn(followBtn, isFollowing);
-      followBtn.disabled = false;
-    }, 1000);
+    // 调用真实的API来关注/取消关注用户
+    apiCall(
+      "user/watch",
+      {
+        email: user.email,
+        turnon: newFollowState,
+      },
+      "PUT"
+    )
+      .then(() => {
+        // API调用成功，更新状态
+        isFollowing = newFollowState;
+        updateRecommendedFollowBtn(followBtn, isFollowing);
 
-    // 这里可以添加实际的API调用来关注/取消关注用户
-    // apiCall("user/watch", { email: user.email, turnon: isFollowing }, "PUT")
+        // 显示成功反馈
+        followBtn.innerText = isFollowing ? "✅ 已关注" : "✅ 已取消关注";
+
+        setTimeout(() => {
+          updateRecommendedFollowBtn(followBtn, isFollowing);
+          followBtn.disabled = false;
+        }, 1000);
+      })
+      .catch((error) => {
+        // API调用失败，恢复原状态
+        console.error("关注操作失败:", error);
+        updateRecommendedFollowBtn(followBtn, isFollowing);
+        followBtn.disabled = false;
+        errorPopup("关注操作失败，请稍后重试");
+      });
   });
 
   // 组装卡片
