@@ -1,0 +1,10 @@
+{
+  "buildCommand": "node -e \"const fs=require('fs'); const html=fs.readFileSync('index.html','utf8'); fs.writeFileSync('index.html', html.replace('{{BACKEND_URL}}', process.env.BACKEND_URL || ''));\"",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
