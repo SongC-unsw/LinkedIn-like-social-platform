@@ -19,5 +19,56 @@ body {
 .current-user-name:hover {
   cursor: pointer;
   transition: text-shadow 0.3s ease;
-  text-shadow: 0 0 3px rgba(0,0,0,0.2);
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+}
+
+/* 推荐用户区域样式 */
+.recommended-users-section {
+  border-left: 4px solid #0d6efd;
+}
+
+.recommended-users-container {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #0d6efd #f8f9fa;
+}
+
+.recommended-users-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.recommended-users-container::-webkit-scrollbar-track {
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.recommended-users-container::-webkit-scrollbar-thumb {
+  background: #0d6efd;
+  border-radius: 10px;
+}
+
+.recommended-users-container::-webkit-scrollbar-thumb:hover {
+  background: #0b5ed7;
+}
+
+.recommended-user-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.recommended-user-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.recommended-user-card .user-avatar {
+  transition: transform 0.3s ease;
+}
+
+.recommended-user-card:hover .user-avatar {
+  transform: scale(1.05);
+}
+
+.recommended-user-card .fw-bold:hover {
+  color: #0d6efd !important;
+  transition: color 0.3s ease;
 }
