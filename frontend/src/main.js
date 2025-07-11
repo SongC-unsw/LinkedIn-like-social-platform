@@ -20,33 +20,13 @@ const apiCall = (path, body, mtd) => {
     },
     body: mtd === "GET" ? undefined : JSON.stringify(body),
   })
-    .then((response) => {
-      if (!response.ok) {
-        return response
-          .json()
-          .then((errorData) => {
-            throw new Error(
-              errorData.error || `HTTP error! status: ${response.status}`
-            );
-          })
-          .catch(() => {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          });
-      }
-      return response.json();
-    })
+    .then((response) => response.json())
     .then((data) => {
       if (data.error) {
         errorPopup(data.error);
-        throw new Error(data.error);
       } else {
         return Promise.resolve(data);
       }
-    })
-    .catch((error) => {
-      console.error("API call failed:", error);
-      errorPopup(error.message || "Network error occurred");
-      throw error;
     });
 };
 
@@ -838,21 +818,13 @@ loginBtn.addEventListener("click", (event) => {
     email: email,
     password: password,
   };
-  apiCall("auth/login", Data, "POST")
-    .then((response) => {
-      if (response && response.token && response.userId) {
-        localStorage.setItem("token", response.token);
-        localStorage.setItem("userId", response.userId);
-        showPage("home");
-        loadFeed(".feed", 0);
-        updateUserDisplay();
-      } else {
-        errorPopup("Invalid login response from server");
-      }
-    })
-    .catch((error) => {
-      console.error("Login failed:", error);
-    });
+  apiCall("auth/login", Data, "POST").then((response) => {
+    localStorage.setItem("token", response.token);
+    localStorage.setItem("userId", response.userId);
+    showPage("home");
+    loadFeed(".feed", 0);
+    updateUserDisplay();
+  });
 });
 
 // links
