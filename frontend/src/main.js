@@ -758,147 +758,9 @@ const updateFollowBtn = (btn, isFollowing) => {
   }
 };
 
-// 推荐用户功能
-const loadRecommendedUsers = () => {
-  // 创建一些示例推荐用户，您可以根据需要修改这些用户信息
-  const recommendedUsers = [
-    { id: 101, name: "张三", email: "augustine@example.com", image: null },
-    { id: 102, name: "李四", email: "demo@demo.com", image: null },
-    { id: 103, name: "王五", email: "wangwu@example.com", image: null },
-    { id: 104, name: "赵六", email: "zhaoliu@example.com", image: null },
-    { id: 105, name: "孙七", email: "sunqi@example.com", image: null },
-    { id: 106, name: "周八", email: "zhouba@example.com", image: null },
-  ];
-
-  displayRecommendedUsers(recommendedUsers);
-};
-
-const displayRecommendedUsers = (users) => {
-  const container = document.querySelector(".recommended-users-container");
-
-  // 清空容器
-  while (container.firstChild) {
-    container.removeChild(container.firstChild);
-  }
-
-  if (users.length === 0) {
-    const noUsersMessage = document.createElement("div");
-    noUsersMessage.className = "text-muted text-center w-100";
-    noUsersMessage.innerText = "暂无推荐用户";
-    container.appendChild(noUsersMessage);
-    return;
-  }
-
-  users.forEach((user) => {
-    const userCard = createRecommendedUserCard(user);
-    container.appendChild(userCard);
-  });
-};
-
-const createRecommendedUserCard = (user) => {
-  const card = document.createElement("div");
-  card.className =
-    "recommended-user-card bg-light border rounded p-3 text-center";
-  card.style.minWidth = "180px";
-  card.style.maxWidth = "180px";
-  card.style.flexShrink = "0";
-
-  // 用户头像
-  const avatar = document.createElement("div");
-  avatar.className =
-    "user-avatar mx-auto mb-2 rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center";
-  avatar.style.width = "60px";
-  avatar.style.height = "60px";
-  avatar.style.fontSize = "1.5rem";
-
-  if (user.image) {
-    const avatarImg = document.createElement("img");
-    avatarImg.className = "rounded-circle";
-    avatarImg.src = user.image;
-    avatarImg.alt = "用户头像";
-    avatarImg.style.width = "60px";
-    avatarImg.style.height = "60px";
-    avatarImg.style.objectFit = "cover";
-    avatar.classList.remove("bg-secondary");
-    avatar.appendChild(avatarImg);
-  } else {
-    avatar.textContent = user.name ? user.name.charAt(0) : "U";
-  }
-
-  // 用户名
-  const userName = document.createElement("div");
-  userName.className = "fw-bold mb-1";
-  userName.innerText = user.name || "Unknown User";
-  userName.style.cursor = "pointer";
-  userName.addEventListener("click", () => {
-    // 模拟用户详情，实际使用中应该调用真实的API
-    const mockUserResponse = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      image: user.image,
-      usersWhoWatchMeUserIds: [],
-      jobs: [],
-    };
-    constructProfilePage(mockUserResponse);
-    showPage("profile");
-  });
-
-  // 用户邮箱
-  const userEmail = document.createElement("div");
-  userEmail.className = "text-muted small mb-2";
-  userEmail.innerText = user.email || "";
-
-  // 关注按钮
-  const followBtn = document.createElement("button");
-  followBtn.className = "btn btn-primary btn-sm w-100";
-  followBtn.innerText = "👀 关注";
-
-  let isFollowing = false;
-
-  followBtn.addEventListener("click", () => {
-    isFollowing = !isFollowing;
-    updateRecommendedFollowBtn(followBtn, isFollowing);
-
-    // 显示关注状态反馈
-    const originalText = followBtn.innerText;
-    followBtn.innerText = isFollowing ? "✅ 已关注" : "✅ 已取消关注";
-    followBtn.disabled = true;
-
-    setTimeout(() => {
-      updateRecommendedFollowBtn(followBtn, isFollowing);
-      followBtn.disabled = false;
-    }, 1000);
-
-    // 这里可以添加实际的API调用来关注/取消关注用户
-    // apiCall("user/watch", { email: user.email, turnon: isFollowing }, "PUT")
-  });
-
-  // 组装卡片
-  card.appendChild(avatar);
-  card.appendChild(userName);
-  card.appendChild(userEmail);
-  card.appendChild(followBtn);
-
-  return card;
-};
-
-const updateRecommendedFollowBtn = (btn, isFollowing) => {
-  if (isFollowing) {
-    btn.innerText = "✅ 已关注";
-    btn.classList.remove("btn-primary");
-    btn.classList.add("btn-success");
-  } else {
-    btn.innerText = "👀 关注";
-    btn.classList.remove("btn-success");
-    btn.classList.add("btn-primary");
-  }
-};
-
 if (localStorage.getItem("token")) {
   showPage("home");
   loadFeed(".feed", 0);
-  loadRecommendedUsers(); // 加载推荐用户
 } else {
   showPage("login");
 }
@@ -941,7 +803,6 @@ submitBtn.addEventListener("click", () => {
       localStorage.setItem("userId", data.userId);
       showPage("home");
       loadFeed(".feed", 0);
-      loadRecommendedUsers(); // 加载推荐用户
       updateUserDisplay();
     });
   }
@@ -962,7 +823,6 @@ loginBtn.addEventListener("click", (event) => {
     localStorage.setItem("userId", response.userId);
     showPage("home");
     loadFeed(".feed", 0);
-    loadRecommendedUsers(); // 加载推荐用户
     updateUserDisplay();
   });
 });
