@@ -12,7 +12,7 @@ const showPage = (chosenPage) => {
 
 const apiCall = (path, body, mtd) => {
   const token = localStorage.getItem("token");
-  return fetch("https://ass3-backend.onrender.com/" + path, {
+  return fetch("https://ass3-backend-production.up.railway.app/" + path, {
     method: mtd,
     headers: {
       "Content-type": "application/json",
