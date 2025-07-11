@@ -762,7 +762,7 @@ const updateFollowBtn = (btn, isFollowing) => {
 const loadRecommendedUsers = () => {
   // 创建一些示例推荐用户，您可以根据需要修改这些用户信息
   const recommendedUsers = [
-    { id: 101, name: "张三", email: "augustine@example.com", image: null },
+    { id: 101, name: "张三", email: "augustine@email.com", image: null },
     { id: 102, name: "李四", email: "demo@demo.com", image: null },
     { id: 103, name: "王五", email: "wangwu@example.com", image: null },
     { id: 104, name: "赵六", email: "zhaoliu@example.com", image: null },
