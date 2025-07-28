@@ -3,6 +3,10 @@ import { BACKEND_PORT } from "./config.js";
 import { fileToDataUrl } from "./helpers.js";
 import "../styles/global.css";
 
+// 导入 Bootstrap
+import "bootstrap/dist/css/bootstrap.min.css";
+import * as bootstrap from "bootstrap";
+
 // 懒加载和占位符相关函数
 // 全局observer管理器
 window.imageObservers = new Set();
