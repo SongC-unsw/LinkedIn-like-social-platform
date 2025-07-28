@@ -96,7 +96,7 @@
       "maxDuration": 10
     }
   },
-  "regions": ["hkg1", "sin1"],
+
   "build": {
     "env": {
       "NODE_ENV": "production"
