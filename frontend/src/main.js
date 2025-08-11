@@ -7,131 +7,12 @@ import "../styles/global.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as bootstrap from "bootstrap";
 
-// 懒加载和占位符相关函数
-// 全局observer管理器
-window.imageObservers = new Set();
-
-const clearAllObservers = () => {
-  window.imageObservers.forEach((observer) => {
-    observer.disconnect();
-  });
-  window.imageObservers.clear();
-};
-
-const createImagePlaceholder = (width, height) => {
-  const placeholder = document.createElement("div");
-  placeholder.className = "image-placeholder";
-  placeholder.style.width = width;
-  placeholder.style.height = height;
-  placeholder.style.backgroundColor = "#e9ecef";
-  placeholder.style.display = "flex";
-  placeholder.style.alignItems = "center";
-  placeholder.style.justifyContent = "center";
-  placeholder.style.color = "#6c757d";
-  placeholder.style.fontSize = "14px";
-  placeholder.innerHTML =
-    '<div class="spinner-border spinner-border-sm" role="status"></div>';
-  return placeholder;
-};
-
-const lazyLoadImage = (imgElement, src, placeholder = null) => {
-  if (!src) return;
-
-  // 创建一个新的Image对象来预加载
-  const tempImg = new Image();
-
-  tempImg.onload = () => {
-    // 图片加载完成后设置src
-    imgElement.src = src;
-
-    // 恢复图片的正常显示状态
-    imgElement.style.position = "";
-    imgElement.style.visibility = "";
-    imgElement.style.opacity = "0";
-    imgElement.style.transition = "opacity 0.3s ease";
-
-    // 移除占位符
-    if (placeholder && placeholder.parentNode) {
-      placeholder.parentNode.removeChild(placeholder);
-    }
-
-    // 淡入效果
-    setTimeout(() => {
-      imgElement.style.opacity = "1";
-    }, 10);
-  };
-
-  tempImg.onerror = () => {
-    // 加载失败时恢复图片状态并移除占位符
-    imgElement.style.position = "";
-    imgElement.style.visibility = "";
-    imgElement.style.opacity = "1";
-
-    if (placeholder && placeholder.parentNode) {
-      placeholder.parentNode.removeChild(placeholder);
-    }
-  };
-
-  // 开始加载图片
-  tempImg.src = src;
-};
-
 const setupLazyLoading = (imgElement, src, containerElement = null) => {
   if (!src) return;
-
-  let placeholder = null;
-  let observeTarget = imgElement;
-
-  // 只有在有容器元素时才创建占位符
-  if (containerElement) {
-    // 获取目标尺寸
-    const width = imgElement.style.width || "100%";
-    const height = imgElement.style.height || "auto";
-
-    placeholder = createImagePlaceholder(width, height);
-
-    // 复制相关的class到占位符
-    if (imgElement.className.includes("rounded-circle")) {
-      placeholder.style.borderRadius = "50%";
-    }
-
-    // 在图片前插入占位符
-    containerElement.insertBefore(placeholder, imgElement);
-
-    // 暂时隐藏真实图片，但不用display:none
-    imgElement.style.opacity = "0";
-    imgElement.style.position = "absolute";
-    imgElement.style.visibility = "hidden";
-
-    // 观察占位符而不是隐藏的图片
-    observeTarget = placeholder;
-  } else {
-    // 没有容器时，直接设置初始透明度用于淡入效果
-    imgElement.style.opacity = "0";
-  }
-
-  // 使用Intersection Observer进行懒加载
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          // 开始加载图片
-          lazyLoadImage(imgElement, src, placeholder);
-
-          // 停止观察并从管理器中移除
-          observer.unobserve(observeTarget);
-          window.imageObservers.delete(observer);
-        }
-      });
-    },
-    {
-      rootMargin: "50px", // 提前50px开始加载
-    }
-  );
-
-  // 添加到全局管理器
-  window.imageObservers.add(observer);
-  observer.observe(observeTarget);
+  // 使用原生懒加载
+  imgElement.loading = "lazy";
+  imgElement.decoding = "async";
+  imgElement.src = src;
 };
 
 const showPage = (chosenPage) => {
@@ -140,9 +21,6 @@ const showPage = (chosenPage) => {
     window.removeEventListener("scroll", window.scrollListener);
     window.scrollListener = null;
   }
-
-  // 清理所有图片observers
-  clearAllObservers();
 
   const pages = document.querySelectorAll(".page");
   for (const page of pages) {
